@@ -30,8 +30,8 @@
 ## 1. Items
 
 ### PROJ — Project and repo plumbing
-- [ ] T-PROJ-01 Set a repo-local personal commit identity (hard gate before any commit)
-- [ ] T-PROJ-02 Create the fork, place it at the project path, and add the `macalla` branch with the project files
+- [x] T-PROJ-01 Set a repo-local personal commit identity (hard gate before any commit) (resolved 2026-10-31: set in `.git/config`; verify with `git config --show-origin user.email` on any new clone)
+- [x] T-PROJ-02 Create the fork, place it at the project path, and add the `macalla` branch with the project files (resolved 2026-10-31: fork public, `macalla` is the default branch, `main` tracks `upstream/main`, local-only files in `.git/info/exclude`)
 
 ### BUILD — Track 1: Own Build Recording a Webinar
 - [ ] T-BUILD-01 Install the pinned toolchain: rustup (Rust 1.94.0), pnpm 11.1.1, process-compose, Xcode Metal Toolchain
@@ -43,25 +43,6 @@
 - [ ] T-BUILD-07 Configure a third-party transcription API as the fallback and confirm it transcribes
 
 ## 2. Item detail
-
-### PROJ
-- **T-PROJ-01** — The global git email is a work address and must never author a commit
-  on this public fork. Set `user.name` / `user.email` in the repo's `.git/config`, using
-  the personal address in `CLAUDE.local.md`. Runs inside T-PROJ-02, right after
-  `git init` and before the first commit. Verify with `git config --show-origin
-  user.email`.
-- **T-PROJ-02** — On hold until the operator has a tar backup of the project directory.
-  Then it needs an explicit go, because it's destructive (the current `.git` is
-  replaced). Steps:
-  1. `gh repo fork fastrepl/anarlog --fork-name macalla --clone=false`.
-  2. At the project path: remove the old `.git` and the scaffolding that doesn't belong
-     in the fork, then `git init`, add `origin` (fork) and `upstream`, fetch, and check
-     out `main` tracking `upstream/main`.
-  3. `git switch -c macalla`, commit `CLAUDE.md`, `TODO.md`, `macalla/`, push, and set
-     `macalla` as the fork's default branch.
-  4. Add `CLAUDE.local.md` and `collateral/` to `.git/info/exclude`.
-  5. Scrub check before the first push: nothing personal or work-related in any
-     committed file.
 
 ### BUILD
 - **T-BUILD-01** — What's on the machine now: Homebrew `rust` 1.99.1 (no rustup), Node 26,

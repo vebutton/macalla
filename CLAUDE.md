@@ -98,7 +98,7 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
   recording a real webinar and transcribing it on the local GPU, with a third-party
   transcription API as the fallback. First test: a recorded webinar played from YouTube
   (same system-audio path). Final check: a live webinar.
-- **Status:** Not started. The fork doesn't exist yet (T-PROJ-02).
+- **Status:** Not started. The fork is set up; T-BUILD-01 is next.
 - **Depends on:** Nothing. This is the first track.
 
 **Further tracks:** None yet. Candidates sit in `TODO.md` → Unscheduled.
@@ -112,22 +112,21 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 
 > Task state is not kept here: open items, progress and recurring work live in `TODO.md`.
 
-**Last:** 2026-10-31. Project scoped. Repo model agreed: public fork, `macalla` branch,
-`macalla/` docs folder. Project files written, waiting to move into the fork.
+**Last:** 2026-10-31. Project scoped and the fork set up: public, `macalla` is the default
+branch, project files committed. No build work yet.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
    on demand.
-2. T-PROJ-02 is **on hold** until the operator has tarred up the project directory as a
-   backup. Confirm the backup exists before any destructive step.
-3. T-PROJ-02 + T-PROJ-01: create the fork and put it at the project path. Set the
-   repo-local identity straight after `git init`, before the first commit. Then add the
-   `macalla` branch with the project files.
-4. T-BUILD-01: install the pinned toolchain (rustup, pnpm, process-compose, Metal
-   Toolchain).
+2. T-BUILD-01: install the pinned toolchain (rustup, pnpm, process-compose, Metal
+   Toolchain). Everything else in Track 1 waits on it.
+3. T-BUILD-02: first `pnpm dev:desktop` launch.
 
 **Continuity reminders:**
-- The global git email is a work address. Never let it author a commit here.
+- The global git email is a work address. The repo-local identity is set, but re-check
+  `git config --show-origin user.email` on any fresh clone before committing.
+- Upstream's `.claude/skills/` load into every session here. Never invoke them; they are
+  for upstream maintainers.
 - The Homebrew `rust` already on the machine will shadow rustup unless PATH order is
   fixed. Verify `rustc --version` reports 1.94.0 inside the repo.
 - Node 26 is installed. Upstream CI uses 22; if the build misbehaves, try 22 first.
