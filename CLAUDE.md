@@ -1,0 +1,139 @@
+# Macalla — Project Context for Claude Code
+
+> *Macalla* is Irish for "echo" (Scottish Gaelic *mac-talla*): an app that catches
+> what's said and plays it back.
+
+## User
+The operator — an experienced technologist re-learning native app builds by working in a
+real codebase they didn't write. Comfortable with Claude Code, Git and the macOS command
+line; hasn't forked and built someone else's app in a long time. Committed files never
+name the user: personal details live in `CLAUDE.local.md`.
+
+## This Project
+Macalla is a personal fork of [fastrepl/anarlog](https://github.com/fastrepl/anarlog), an
+open-source, on-device meeting recorder and transcriber (Tauri 2 + Rust + React). The goal
+is learning: build the app from source on an Apple Silicon Mac and use it for real,
+recording webinars without a meeting bot. Transcription runs on the local GPU, with a
+third-party transcription API as the fallback. Changes to the app come later, if at all.
+
+- **Full requirements:** [macalla/requirements.md](macalla/requirements.md)
+- **Task register:** [TODO.md](TODO.md) — the only durable task list. Read it before
+  planning any work.
+- **Internal details:** `CLAUDE.local.md` — not committed (listed in `.git/info/exclude`),
+  read it every session.
+
+## Repo Model — Read Before Any Git Operation
+- **This repo is a public GitHub fork.** Everything committed is public.
+- **Nothing work-related is ever committed**: no employer, colleagues, customers, work
+  meetings, and no names of video-conferencing products. Say "a live webinar" or "a
+  video call". This covers code, docs, TODO.md and commit messages.
+- **Branches:**
+  - `main` mirrors `upstream/main` (fastrepl/anarlog). Fast-forward only. Never commit to it.
+  - `macalla` (the fork's default branch) carries this project's files and any local
+    changes. All project work happens here.
+  - Upstream PR branches are cut from `main`, so they can never carry project files.
+- **Remotes:** `origin` = the fork, `upstream` = fastrepl/anarlog.
+- **Project files sit beside upstream's without colliding:** `CLAUDE.md`, `TODO.md` and
+  the `macalla/` folder. Upstream's `docs/` is their published product-docs site, so
+  project docs never go there. This is why requirements and session state live in
+  `macalla/`, not `docs/`.
+- **Local-only files** (`CLAUDE.local.md`, `collateral/`) are excluded via
+  `.git/info/exclude`. Upstream's `.gitignore` is left untouched.
+- **Commit identity:** repo-local personal identity only, set in `.git/config`. The global
+  git identity must never author a commit here.
+
+## Upstream's AI Files
+Upstream ships its own agent config. None of it is deleted or edited, so upstream's files
+stay byte-identical and PRs remain possible.
+- **Use:** root `AGENTS.md` (workspace map, commands, CI-mirroring checks), nested
+  per-component `AGENTS.md` files, `CONTRIBUTING.md`. Read the nearest `AGENTS.md` before
+  changing a component. Don't copy their content here; point to it.
+- **Ignore:** `AGENTS.md` sections on GitButler (they apply only on a `gitbutler/workspace`
+  branch), the gh-enterprise helper, and "record decisions in Linear". Here, decisions
+  go to `TODO.md` and `macalla/session-state.md`. Also ignore `.claude/skills/` (upstream
+  maintainer operations: releases, newsletters, PR triage), `.codex/`, `.cursor/`.
+- **Decline:** the expo plugin (`.claude/settings.json`) and the Expo MCP server
+  (`.mcp.json`) when Claude Code offers them. They are for the mobile app, which is out of
+  scope.
+
+## Input / Output
+- **Input:** the upstream source tree, plus audio from the mic and system output during a
+  webinar.
+- **Output:** a locally built Macalla/Anarlog desktop app that records and transcribes
+  on-device. Build notes and findings go in `macalla/`.
+
+## Interface
+macOS desktop app (Tauri). Development happens through Claude Code in VSCode, with the
+terminal for builds.
+
+## Tech / Tooling
+Upstream's stack, pinned by upstream. Don't pick different versions.
+- **Rust 1.94.0** via `rust-toolchain.toml`, which needs **rustup**. Homebrew's `rust`
+  ignores the pin.
+- **Node 22+** (CI uses 22), **pnpm 11.1.1** (`package.json#packageManager`),
+  **process-compose 1.122.0+**.
+- **Full Xcode plus its Metal Toolchain.** Command Line Tools alone can't build the MLX
+  shaders that Soniqo local transcription needs.
+- Tauri 2 system prerequisites.
+- Checkout path must contain no spaces (or set `CARGO_TARGET_DIR`).
+- Coding subagents: Claude Code's built-in subagents by default.
+
+## How to Work With This User
+- The aim is learning: when a build step fails, explain *why* in a sentence before
+  fixing it.
+- Build first, change later. Don't propose code changes before Track 1 is done.
+- Confirm before anything touching `main`, `upstream`, force-pushes, or the fork's
+  GitHub settings.
+
+## Environment
+- First started: VSCode
+- Date: 2026-10-31
+
+---
+
+## Tracks
+
+### Track 1 — Own Build Recording a Webinar (BUILD)
+- **Objective:** a from-source build of the desktop app running on the Apple Silicon Mac,
+  recording a real webinar and transcribing it on the local GPU, with a third-party
+  transcription API as the fallback. First test: a recorded webinar played from YouTube
+  (same system-audio path). Final check: a live webinar.
+- **Status:** Not started. The fork doesn't exist yet (T-PROJ-02).
+- **Depends on:** Nothing. This is the first track.
+
+**Further tracks:** None yet. Candidates sit in `TODO.md` → Unscheduled.
+
+---
+
+## Session State
+
+> Forward-looking operating context only. Backward-looking archaeology lives in
+> `macalla/session-state.md`. Consult it on demand.
+
+> Task state is not kept here: open items, progress and recurring work live in `TODO.md`.
+
+**Last:** 2026-10-31. Project scoped. Repo model agreed: public fork, `macalla` branch,
+`macalla/` docs folder. Project files written, waiting to move into the fork.
+
+**Next session — pick up here:**
+1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
+   on demand.
+2. T-PROJ-02 is **on hold** until the operator has tarred up the project directory as a
+   backup. Confirm the backup exists before any destructive step.
+3. T-PROJ-02 + T-PROJ-01: create the fork and put it at the project path. Set the
+   repo-local identity straight after `git init`, before the first commit. Then add the
+   `macalla` branch with the project files.
+4. T-BUILD-01: install the pinned toolchain (rustup, pnpm, process-compose, Metal
+   Toolchain).
+
+**Continuity reminders:**
+- The global git email is a work address. Never let it author a commit here.
+- The Homebrew `rust` already on the machine will shadow rustup unless PATH order is
+  fixed. Verify `rustc --version` reports 1.94.0 inside the repo.
+- Node 26 is installed. Upstream CI uses 22; if the build misbehaves, try 22 first.
+
+**Session continuity:** Next session is a cold start. Re-read CLAUDE.md before doing
+anything. Sessions are never re-entered. End-of-session updates cover three layers: this
+brief, `macalla/session-state.md`, and `TODO.md`.
+Full archaeology: `macalla/session-state.md` — consult when prior-thread depth, decision
+reasoning, or ruled-out paths are needed.
