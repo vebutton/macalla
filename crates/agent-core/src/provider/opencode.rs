@@ -1,6 +1,5 @@
 use crate::{
-    HealthCheckOptions, InstallCliResponse, ProviderAuthStatus, ProviderHealth,
-    ProviderHealthStatus, ProviderKind, UninstallCliResponse,
+    HealthCheckOptions, ProviderAuthStatus, ProviderHealth, ProviderHealthStatus, ProviderKind,
 };
 
 pub fn health(options: &HealthCheckOptions) -> ProviderHealth {
@@ -13,71 +12,11 @@ pub fn health(options: &HealthCheckOptions) -> ProviderHealth {
         provider: ProviderKind::Opencode,
         binary_path: health.binary_path,
         installed: health.installed,
-        integration_installed: integration_installed().unwrap_or(false),
         version: health.version,
         status: health.status.into(),
         auth_status: health.auth_status.into(),
         message: health.message,
     }
-}
-
-pub fn install_cli() -> Result<InstallCliResponse, String> {
-    let plugin_path = anlg_opencode::plugin_path();
-
-    if plugin_path.exists() && !anlg_opencode::is_char_plugin(&plugin_path)? {
-        return Err(format!(
-            "refusing to replace existing plugin at {}",
-            plugin_path.display()
-        ));
-    }
-
-    anlg_opencode::write_plugin(&plugin_path)?;
-
-    Ok(InstallCliResponse {
-        provider: ProviderKind::Opencode,
-        target_path: plugin_path.clone(),
-        message: format!(
-            "Installed char as OpenCode plugin at {}",
-            plugin_path.display()
-        ),
-    })
-}
-
-pub fn uninstall_cli() -> Result<UninstallCliResponse, String> {
-    let plugin_path = anlg_opencode::plugin_path();
-
-    if plugin_path.exists() && !anlg_opencode::has_char_plugin(&plugin_path)? {
-        return Err(format!(
-            "refusing to remove existing plugin at {}",
-            plugin_path.display()
-        ));
-    }
-
-    anlg_opencode::remove_plugin(&plugin_path)?;
-
-    Ok(UninstallCliResponse {
-        provider: ProviderKind::Opencode,
-        target_path: plugin_path.clone(),
-        message: format!(
-            "Removed char as OpenCode plugin from {}",
-            plugin_path.display()
-        ),
-    })
-}
-
-pub fn upgrade() {
-    upgrade_at(&anlg_opencode::plugin_path());
-}
-
-fn upgrade_at(plugin_path: &std::path::Path) {
-    if anlg_opencode::is_char_plugin(plugin_path).unwrap_or(false) {
-        let _ = anlg_opencode::write_plugin(plugin_path);
-    }
-}
-
-fn integration_installed() -> Result<bool, String> {
-    let plugin_path = anlg_opencode::plugin_path();
-    anlg_opencode::is_char_plugin(&plugin_path)
 }
 
 impl From<anlg_opencode::HealthStatus> for ProviderHealthStatus {
@@ -97,38 +36,5 @@ impl From<anlg_opencode::HealthAuthStatus> for ProviderAuthStatus {
             anlg_opencode::HealthAuthStatus::Unauthenticated => Self::Unauthenticated,
             anlg_opencode::HealthAuthStatus::Unknown => Self::Unknown,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn upgrade_is_a_noop_when_not_installed() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("char.ts");
-
-        upgrade_at(&path);
-        assert!(!path.exists());
-        std::fs::write(&path, "export const plugin = {};\n").unwrap();
-
-        upgrade_at(&path);
-
-        let contents = std::fs::read_to_string(&path).unwrap();
-        assert_eq!(contents, "export const plugin = {};\n");
-    }
-
-    #[test]
-    fn upgrade_refreshes_existing_plugin() {
-        let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("char.ts");
-
-        let old_plugin = r#"const child = Bun.spawn(["char", "opencode", "notify"]);"#;
-        std::fs::write(&path, old_plugin).unwrap();
-
-        upgrade_at(&path);
-
-        assert!(anlg_opencode::has_char_plugin(&path).unwrap());
     }
 }

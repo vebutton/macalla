@@ -8,10 +8,7 @@ mod options;
 mod output_schema;
 mod thread;
 
-pub use config::{
-    NOTIFY_COMMAND, NotifyEvent, config_path, has_notify, notify_command, read_config,
-    remove_notify, set_notify, write_config,
-};
+pub use config::{config_path, read_config};
 pub use error::Error;
 pub use events::{
     EventStream, Input, RunStreamedResult, ThreadError, ThreadEvent, ThreadItem, Turn, Usage,

@@ -36,7 +36,6 @@ pub struct ProviderHealth {
     pub provider: ProviderKind,
     pub binary_path: PathBuf,
     pub installed: bool,
-    pub integration_installed: bool,
     pub version: Option<String>,
     pub status: ProviderHealthStatus,
     pub auth_status: ProviderAuthStatus,
