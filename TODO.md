@@ -37,8 +37,8 @@
 ### BUILD — Track 1: Own Build Recording a Webinar
 - [x] T-BUILD-01 Install the pinned toolchain: rustup (Rust 1.94.0), pnpm 11.1.1, process-compose, Xcode Metal Toolchain (resolved 2026-10-31: sandboxed to this repo via a local-only direnv `.envrc`: keg-only Homebrew rustup gives 1.94.0 here while Homebrew `rust` stays the default elsewhere; process-compose 1.124.0 release binary in local-only `.tools/bin`; Homebrew pnpm auto-switches to 11.1.1; Metal Toolchain was already present)
 - [x] T-BUILD-02 Install workspace dependencies and get `pnpm dev:desktop` to launch the app (resolved 2026-10-31: app launches to onboarding; needed cmake and a keychain-free Swift resolve, see `macalla/build-notes.md`)
-- [ ] T-BUILD-03 Grant macOS microphone and system-audio permissions and confirm both are captured
-- [ ] T-BUILD-04 Set up GPU on-device transcription (Soniqo or whisper.cpp) and confirm it transcribes
+- [x] T-BUILD-03 Grant macOS microphone and system-audio permissions and confirm both are captured (resolved 2026-11-01: granted to the bundled app; mic and system audio both transcribed in a test recording)
+- [x] T-BUILD-04 Set up GPU on-device transcription (Soniqo or whisper.cpp) and confirm it transcribes (resolved 2026-11-01: Soniqo Parakeet Batch, after recording; 52 s test transcribed locally in ~3 s with no network transcription attempt)
 - [ ] T-BUILD-05 Test: record and transcribe a recorded webinar played from YouTube
 - [ ] T-BUILD-06 Final check: record and transcribe a live webinar
 - [ ] T-BUILD-07 Configure a third-party transcription API as the fallback and confirm it transcribes
@@ -47,23 +47,11 @@
 ## 2. Item detail
 
 ### BUILD
-- **T-BUILD-03** — Settled: dev mode can't hold audio permissions (the prompt names the
-  launching editor), the bundle can (prompts name Anarlog Dev; both granted 2026-11-01,
-  Accessibility left off). System audio confirmed captured in the onboarding demo. Still
-  open: the mic channel was exact digital silence (RMS 0), so confirm the mic by talking
-  during a recording.
-- **T-BUILD-04** — First recording showed the defaults: live transcription tried a cloud
-  provider (Deepgram) and failed with 401 since there's no key or account; after stop, the
-  app fell back to on-device Soniqo Parakeet batch, auto-downloading ~640 MB of models
-  (Parakeet TDT v3 CoreML + pyannote diarization) to `~/Library/Caches/qwen3-speech`. Set
-  Decided 2026-11-01: Soniqo Parakeet Batch, after-recording only (no live transcript for
-  now). The silent cloud fallback is blocked in `macalla`: an empty server URL now means
-  after-recording mode, and the live adapter refuses an empty URL. Still to confirm: a
-  recording with talking transcribes both channels locally with no network attempt.
-  Both GPU paths run on Metal: Soniqo (MLX, downloaded in-app) and
-  "On-device file" (a whisper.cpp `.bin`). Apple Speech isn't a GPU path. Each model is
-  labeled **Live** or **After recording** in Settings → Transcription; note which label
-  each one has.
+- **T-BUILD-05** — First short YouTube test (2026-11-01) worked end to end. With speakers
+  rather than headphones, the mic picks up the video audio, so some of the video's words
+  land under the local speaker. Still to check on a full-length webinar: transcript-to-audio
+  alignment (the onboarding demo was split into two transcription passes and drifted; the
+  short test ran as one pass), and behaviour over 30+ minutes.
 - **T-BUILD-08** — Dev mode can't hold macOS audio permissions (they go to the launching
   editor), so "own build" means the ad-hoc-signed bundle (built and in use 2026-11-01). `cargo xtask
   prepare-binaries` builds the CLI into `resources/cli/`; `tauri build --debug --bundles
@@ -73,8 +61,6 @@
   it's invoked as (`anarlog-dev` → the dev app's database), so a plain `macalla` symlink
   would read the wrong one; a `macalla` wrapper must exec `anarlog-dev` or pass
   `--db-path`. `meetings list` is newest-first.
-- **T-BUILD-05** — A YouTube webinar goes through the same system-audio capture as a live
-  call, so it's a cheap, repeatable first test.
 - **T-BUILD-07** — Upstream supports bring-your-own-key transcription providers (Settings
   → Transcription). The key stays in the app's local settings, never in the repo. A
   hosted provider receives the meeting audio. Provider choice and the meaning of
