@@ -47,13 +47,25 @@
 ## 2. Item detail
 
 ### BUILD
-- **T-BUILD-03** — Dev mode launches `target/debug/desktop` from a shell, and upstream has
-  no code that disclaims the parent process, so macOS will likely attribute microphone and
-  system-audio grants to the launching app (the editor or terminal), not to Anarlog. Check
-  which app name the macOS prompt shows before granting. Onboarding also asks for
-  Accessibility ("read meeting activity"); not needed for recording.
+- **T-BUILD-03** — Settled: dev mode can't hold audio permissions (the prompt names the
+  launching editor), the bundle can (prompts name Anarlog Dev; both granted 2026-11-01,
+  Accessibility left off). System audio confirmed captured in the onboarding demo. Still
+  open: the mic channel was exact digital silence (RMS 0), so confirm the mic by talking
+  during a recording.
+- **T-BUILD-04** — First recording showed the defaults: live transcription tried a cloud
+  provider (Deepgram) and failed with 401 since there's no key or account; after stop, the
+  app fell back to on-device Soniqo Parakeet batch, auto-downloading ~640 MB of models
+  (Parakeet TDT v3 CoreML + pyannote diarization) to `~/Library/Caches/qwen3-speech`. Set
+  Decided 2026-11-01: Soniqo Parakeet Batch, after-recording only (no live transcript for
+  now). The silent cloud fallback is blocked in `macalla`: an empty server URL now means
+  after-recording mode, and the live adapter refuses an empty URL. Still to confirm: a
+  recording with talking transcribes both channels locally with no network attempt.
+  Both GPU paths run on Metal: Soniqo (MLX, downloaded in-app) and
+  "On-device file" (a whisper.cpp `.bin`). Apple Speech isn't a GPU path. Each model is
+  labeled **Live** or **After recording** in Settings → Transcription; note which label
+  each one has.
 - **T-BUILD-08** — Dev mode can't hold macOS audio permissions (they go to the launching
-  editor), so recording needs a bundle; T-BUILD-03 waits on this. `cargo xtask
+  editor), so "own build" means the ad-hoc-signed bundle (built and in use 2026-11-01). `cargo xtask
   prepare-binaries` builds the CLI into `resources/cli/`; `tauri build --debug --bundles
   app` with a `--config` override (ad-hoc signing, no updater artifacts, CLI listed in
   `externalBin`) keeps upstream files untouched. On launch the app symlinks the CLI to
@@ -61,10 +73,6 @@
   it's invoked as (`anarlog-dev` → the dev app's database), so a plain `macalla` symlink
   would read the wrong one; a `macalla` wrapper must exec `anarlog-dev` or pass
   `--db-path`. `meetings list` is newest-first.
-- **T-BUILD-04** — Both GPU paths run on Metal: Soniqo (MLX, downloaded in-app) and
-  "On-device file" (a whisper.cpp `.bin`). Apple Speech isn't a GPU path. Each model is
-  labeled **Live** or **After recording** in Settings → Transcription; note which label
-  each one has.
 - **T-BUILD-05** — A YouTube webinar goes through the same system-audio capture as a live
   call, so it's a cheap, repeatable first test.
 - **T-BUILD-07** — Upstream supports bring-your-own-key transcription providers (Settings
@@ -73,12 +81,6 @@
   "fallback" are open questions (section 3).
 
 ## 3. Open questions
-- Does "own build running" mean dev mode (`pnpm dev:desktop`), or a bundled `.app`
-  (ad-hoc signed, no paid developer account)? Resolves at T-BUILD-06.
-- In dev mode, macOS may attach audio permissions to the launching terminal or editor
-  rather than the app. Does that affect capture? Resolves at T-BUILD-03.
-- Soniqo or whisper.cpp for GPU transcription? Pick on accuracy, live vs after-recording,
-  and model size. Resolves at T-BUILD-04.
 - Which third-party transcription API is the fallback? Resolves at T-BUILD-07.
 - Does "fallback" mean switching provider by hand when the GPU path fails (which
   upstream appears to support), or automatic failover (which would be a code change,
@@ -100,10 +102,18 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
   internals, if the work gets that deep.
 - Summaries through a local model (Ollama or LM Studio).
 - Contribute a fix upstream (branch from `main`, never `macalla`).
+- Remove the upsell UI (e.g. "Get Pro" on the Summary tab) from the Macalla build.
+- Connect to a local OpenAI-compatible speech server (e.g. oMLX, on this Mac or another
+  machine on the home network; both count as local) so one model serves every tool. Needs
+  an adapter change: today any localhost URL is treated as Deepgram-compatible. Live
+  transcription would come from another project once proven on the target hardware.
 - Start/stop recording from a script (e.g. an `anarlog://` deep link callable with `open`),
   a candidate for the small-change learning item above. First check whether calendar-based
   "Start when meeting begins" / "Stop when meeting ends" already covers webinars (auto-stop
   may rely on the mic, which a listen-only webinar doesn't use).
+- Direct calendar connection that bypasses the vendor's cloud (ICS feed or the app's own
+  OAuth). Try first: add the calendar account to macOS Internet Accounts and use the
+  app's local Apple Calendar provider, which never touches the vendor's servers.
 
 ## 6. Archive
 Closed items whose resolution no longer informs current work.

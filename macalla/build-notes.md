@@ -99,3 +99,33 @@ Settings → Developers → Skills writes an `anarlog` skill into `~/.claude/ski
 the Codex, Cursor, opencode equivalents). That is a live, user-initiated feature, so it
 is disabled only in this fork: `MACALLA_DISABLE_AGENT_SKILLS` in
 `apps/desktop/src-tauri/src/commands.rs`, mirroring the App Store build.
+
+## Bundled app (for recording)
+Dev mode can't hold macOS audio permissions: the prompt names the launching editor or
+terminal, not the app. Recording uses an ad-hoc-signed debug bundle instead:
+
+```sh
+direnv exec . cargo xtask prepare-binaries     # CLI + browser helper, release builds
+cd apps/desktop && direnv exec . pnpm tauri build --debug --bundles app \
+  --features direct-distribution \
+  --config '{"bundle":{"createUpdaterArtifacts":false,"externalBin":["binaries/check-permissions","binaries/char-chrome-native-host","resources/cli/anarlog-cli"],"macOS":{"signingIdentity":"-"}}}'
+cd ../.. && codesign --force --sign - --identifier com.hyprnote.dev \
+  --requirements '=designated => identifier "com.hyprnote.dev"' \
+  --entitlements apps/desktop/src-tauri/Entitlements.plist \
+  "apps/desktop/src-tauri/target/debug/bundle/macos/Anarlog Dev.app"
+```
+
+- `createUpdaterArtifacts: false`: upstream signs updates with a private key we don't have.
+- The re-sign matters: Tauri's ad-hoc signature pins the exact binary (`cdhash`), so every
+  rebuild would look like a new app to macOS and lose its permissions. Pinning the
+  requirement to the identifier (as upstream's dev runner does) keeps grants across builds.
+- Launch from Finder or `open`, never from a terminal, so macOS treats the app as
+  responsible for itself. Output: `apps/desktop/src-tauri/target/debug/bundle/macos/`.
+
+## Blocked: silent cloud fallback for live transcription
+With no live-capable model configured (e.g. Soniqo's model still downloading), upstream
+starts the session anyway with an empty server URL, which resolves to the Deepgram adapter
+and dials Deepgram's cloud (401 without a key). Macalla guards this in `listener-core`: an
+empty URL resolves to after-recording mode (`resolve_transcription_mode`), and the live
+adapter refuses an empty URL. Batch always names an explicit provider, so it has no
+equivalent silent fallback.
