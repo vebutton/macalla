@@ -144,10 +144,14 @@ pub async fn install_embedded_cli<R: tauri::Runtime>(
     crate::embedded_cli::install(&app)
 }
 
+// Macalla: the app never writes into global coding-agent config (~/.claude, ~/.codex,
+// ~/.cursor, opencode). Skill installation is disabled as in the App Store build.
+const MACALLA_DISABLE_AGENT_SKILLS: bool = true;
+
 #[tauri::command]
 #[specta::specta]
 pub async fn list_skill_agents() -> Result<Vec<SkillAgentStatus>, String> {
-    if cfg!(feature = "app-store") {
+    if cfg!(feature = "app-store") || MACALLA_DISABLE_AGENT_SKILLS {
         return Ok(Vec::new());
     }
 
@@ -159,6 +163,9 @@ pub async fn list_skill_agents() -> Result<Vec<SkillAgentStatus>, String> {
 pub async fn install_agent_skill(agent: SkillAgent) -> Result<SkillAgentStatus, String> {
     if cfg!(feature = "app-store") {
         return Err("Agent skill installation is unavailable in the Mac App Store build.".into());
+    }
+    if MACALLA_DISABLE_AGENT_SKILLS {
+        return Err("Agent skill installation is disabled in Macalla.".into());
     }
 
     crate::agent_skills::install(agent)
