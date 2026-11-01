@@ -49,9 +49,11 @@
 ### BUILD
 - **T-BUILD-05** — First short YouTube test (2026-11-01) worked end to end. With speakers
   rather than headphones, the mic picks up the video audio, so some of the video's words
-  land under the local speaker. Still to check on a full-length webinar: transcript-to-audio
-  alignment (the onboarding demo was split into two transcription passes and drifted; the
-  short test ran as one pass), and behaviour over 30+ minutes.
+  land under the local speaker; use headphones. Known limitation: with Soniqo Parakeet
+  Batch the word timings are synthesized, not measured. Only each 29.5 s block's text is
+  kept, and words are laid out from the block start at an estimated pace, so leading
+  silence in a block shifts its words early (playback highlight and click-to-seek drift;
+  text is fine). Check how bad it is over a 30+ minute webinar.
 - **T-BUILD-08** — Dev mode can't hold macOS audio permissions (they go to the launching
   editor), so "own build" means the ad-hoc-signed bundle (built and in use 2026-11-01). `cargo xtask
   prepare-binaries` builds the CLI into `resources/cli/`; `tauri build --debug --bundles
@@ -89,6 +91,9 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
 - Summaries through a local model (Ollama or LM Studio).
 - Contribute a fix upstream (branch from `main`, never `macalla`).
 - Remove the upsell UI (e.g. "Get Pro" on the Summary tab) from the Macalla build.
+- Real word timestamps for Soniqo Parakeet batch transcripts: keep the model's own
+  timings instead of synthesizing them (`listener2-core` batch/simple/local.rs keeps only
+  text; `transcribe-soniqo` responses.rs estimates timing). Upstream-worthy.
 - Connect to a local OpenAI-compatible speech server (e.g. oMLX, on this Mac or another
   machine on the home network; both count as local) so one model serves every tool. Needs
   an adapter change: today any localhost URL is treated as Deepgram-compatible. Live
