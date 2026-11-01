@@ -33,27 +33,35 @@
 - [x] T-PROJ-01 Set a repo-local personal commit identity (hard gate before any commit) (resolved 2026-10-31: set in `.git/config`; verify with `git config --show-origin user.email` on any new clone)
 - [x] T-PROJ-02 Create the fork, place it at the project path, and add the `macalla` branch with the project files (resolved 2026-10-31: fork public, `macalla` is the default branch, `main` tracks `upstream/main`, local-only files in `.git/info/exclude`)
 
+- [ ] T-PROJ-03 Upstream PR: remove the dead coding-agent hook installer (branch `remove-agent-hook-installer`, cut from `main`)
+
 ### BUILD — Track 1: Own Build Recording a Webinar
-- [ ] T-BUILD-01 Install the pinned toolchain: rustup (Rust 1.94.0), pnpm 11.1.1, process-compose, Xcode Metal Toolchain
-- [ ] T-BUILD-02 Install workspace dependencies and get `pnpm dev:desktop` to launch the app
+- [x] T-BUILD-01 Install the pinned toolchain: rustup (Rust 1.94.0), pnpm 11.1.1, process-compose, Xcode Metal Toolchain (resolved 2026-10-31: sandboxed to this repo via a local-only direnv `.envrc`: keg-only Homebrew rustup gives 1.94.0 here while Homebrew `rust` stays the default elsewhere; process-compose 1.124.0 release binary in local-only `.tools/bin`; Homebrew pnpm auto-switches to 11.1.1; Metal Toolchain was already present)
+- [x] T-BUILD-02 Install workspace dependencies and get `pnpm dev:desktop` to launch the app (resolved 2026-10-31: app launches to onboarding; needed cmake and a keychain-free Swift resolve, see `macalla/build-notes.md`)
 - [ ] T-BUILD-03 Grant macOS microphone and system-audio permissions and confirm both are captured
 - [ ] T-BUILD-04 Set up GPU on-device transcription (Soniqo or whisper.cpp) and confirm it transcribes
 - [ ] T-BUILD-05 Test: record and transcribe a recorded webinar played from YouTube
 - [ ] T-BUILD-06 Final check: record and transcribe a live webinar
 - [ ] T-BUILD-07 Configure a third-party transcription API as the fallback and confirm it transcribes
+- [ ] T-BUILD-08 Build an ad-hoc-signed `.app` bundle with the embedded `anarlog` CLI, and confirm the CLI lists and reads recent meetings
 
 ## 2. Item detail
 
 ### BUILD
-- **T-BUILD-01** — What's on the machine now: Homebrew `rust` 1.99.1 (no rustup), Node 26,
-  no pnpm, no corepack, no process-compose, Xcode.app present but Metal Toolchain not
-  yet checked. `brew install rustup` and make sure rustup's shims come before Homebrew
-  `rust` on PATH. Then `rustc --version` inside the repo must report 1.94.0. Metal:
-  `xcodebuild -downloadComponent MetalToolchain`. Also check the Tauri 2 macOS
-  prerequisites.
-- **T-BUILD-02** — `pnpm install --frozen-lockfile`, then `pnpm dev:desktop`. Needs no
-  secrets. Desktop Vite uses port 1422 and the process-compose control port is 18081.
-  Expect the first Rust build to be long.
+- **T-BUILD-03** — Dev mode launches `target/debug/desktop` from a shell, and upstream has
+  no code that disclaims the parent process, so macOS will likely attribute microphone and
+  system-audio grants to the launching app (the editor or terminal), not to Anarlog. Check
+  which app name the macOS prompt shows before granting. Onboarding also asks for
+  Accessibility ("read meeting activity"); not needed for recording.
+- **T-BUILD-08** — Dev mode can't hold macOS audio permissions (they go to the launching
+  editor), so recording needs a bundle; T-BUILD-03 waits on this. `cargo xtask
+  prepare-binaries` builds the CLI into `resources/cli/`; `tauri build --debug --bundles
+  app` with a `--config` override (ad-hoc signing, no updater artifacts, CLI listed in
+  `externalBin`) keeps upstream files untouched. On launch the app symlinks the CLI to
+  `~/.local/bin/anarlog-dev` (dev identifier). The CLI picks its database by the name
+  it's invoked as (`anarlog-dev` → the dev app's database), so a plain `macalla` symlink
+  would read the wrong one; a `macalla` wrapper must exec `anarlog-dev` or pass
+  `--db-path`. `meetings list` is newest-first.
 - **T-BUILD-04** — Both GPU paths run on Metal: Soniqo (MLX, downloaded in-app) and
   "On-device file" (a whisper.cpp `.bin`). Apple Speech isn't a GPU path. Each model is
   labeled **Live** or **After recording** in Settings → Transcription; note which label
@@ -82,7 +90,7 @@ Recurring work: no IDs, no checkboxes, tracked by last-run date.
 
 | Operation | Cadence / trigger | Last run | Notes |
 |---|---|---|---|
-| Sync upstream | Before a build session, or when upstream fixes are wanted | — | Fast-forward `main` to `upstream/main`, then merge `main` into `macalla`. Re-check pinned toolchain versions after syncing. |
+| Sync upstream | Before a build session, or when upstream fixes are wanted | 2026-10-31 (already level) | Fast-forward `main` to `upstream/main`, then merge `main` into `macalla`. Re-check pinned toolchain versions after syncing. |
 
 ## 5. Unscheduled
 Ideas that came up but aren't committed work. No ID until promoted into a track.
@@ -93,6 +101,10 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
   internals, if the work gets that deep.
 - Summaries through a local model (Ollama or LM Studio).
 - Contribute a fix upstream (branch from `main`, never `macalla`).
+- Start/stop recording from a script (e.g. an `anarlog://` deep link callable with `open`),
+  a candidate for the small-change learning item above. First check whether calendar-based
+  "Start when meeting begins" / "Stop when meeting ends" already covers webinars (auto-stop
+  may rely on the mic, which a listen-only webinar doesn't use).
 
 ## 6. Archive
 Closed items whose resolution no longer informs current work.
