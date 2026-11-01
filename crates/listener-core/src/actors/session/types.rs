@@ -68,6 +68,12 @@ pub fn resolve_transcription_mode(
         return TranscriptionMode::Batch;
     }
 
+    // Macalla: no configured server means no live connection. An empty base URL
+    // would otherwise resolve to the Deepgram adapter and dial its cloud default.
+    if base_url.trim().is_empty() {
+        return TranscriptionMode::Batch;
+    }
+
     if let Some(model) = anlg_transcribe_soniqo::local_model_from_request(base_url, model) {
         return if model.supports_live_on_current_platform() && model.supports_languages(languages) {
             TranscriptionMode::Live
@@ -181,6 +187,18 @@ mod tests {
             participant_human_ids: vec![],
             self_human_id: None,
             speaker_assignments: vec![],
+        }
+    }
+
+    #[test]
+    fn empty_base_url_never_goes_live() {
+        for base_url in ["", "   "] {
+            let params = session_params(base_url, "", TranscriptionMode::Live);
+            assert_eq!(
+                params.effective_transcription_mode(),
+                TranscriptionMode::Batch,
+                "base_url {base_url:?} must not resolve to a live (Deepgram default) session"
+            );
         }
     }
 

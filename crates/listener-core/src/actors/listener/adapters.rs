@@ -144,6 +144,13 @@ pub(super) async fn spawn_rx_task(
         return Ok((result.0, result.1, result.2, "apple-speech".to_string()));
     }
 
+    // Macalla: never fall back to a provider's cloud default when no server is configured.
+    if args.base_url.trim().is_empty() {
+        return Err(actor_error(
+            "missing_base_url: no transcription server configured for live transcription",
+        ));
+    }
+
     let adapter_kind =
         AdapterKind::from_url_and_languages(&args.base_url, &args.languages, Some(&args.model));
     let is_dual = matches!(args.mode, crate::actors::ChannelMode::MicAndSpeaker);
