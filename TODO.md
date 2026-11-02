@@ -39,30 +39,20 @@
 - [x] T-BUILD-02 Install workspace dependencies and get `pnpm dev:desktop` to launch the app (resolved 2026-10-31: app launches to onboarding; needed cmake and a keychain-free Swift resolve, see `macalla/build-notes.md`)
 - [x] T-BUILD-03 Grant macOS microphone and system-audio permissions and confirm both are captured (resolved 2026-11-01: granted to the bundled app; mic and system audio both transcribed in a test recording)
 - [x] T-BUILD-04 Set up GPU on-device transcription (Soniqo or whisper.cpp) and confirm it transcribes (resolved 2026-11-01: Soniqo Parakeet Batch, after recording; 52 s test transcribed locally in ~3 s with no network transcription attempt)
-- [ ] T-BUILD-05 Test: record and transcribe a recorded webinar played from YouTube
+- [x] T-BUILD-05 Test: record and transcribe a recorded webinar played from YouTube (resolved 2026-11-01: a 48-minute recorded video transcribed completely on-device, 6,940 words with no missing blocks, about 4 minutes after stop including speaker labels; headset, mixed and speaker audio also tried in a two-way video call)
 - [ ] T-BUILD-06 Final check: record and transcribe a live webinar
 - [ ] T-BUILD-07 Configure a third-party transcription API as the fallback and confirm it transcribes
-- [ ] T-BUILD-08 Build an ad-hoc-signed `.app` bundle with the embedded `anarlog` CLI, and confirm the CLI lists and reads recent meetings
+- [x] T-BUILD-08 Build an ad-hoc-signed `.app` bundle with the embedded `anarlog` CLI, and confirm the CLI lists and reads recent meetings (resolved 2026-11-01: bundle in daily use; `macalla` wrapper in `~/.local/bin` lists, reads and exports meetings to Markdown; rebuild steps in `macalla/build-notes.md`)
 
 ## 2. Item detail
 
 ### BUILD
-- **T-BUILD-05** — First short YouTube test (2026-11-01) worked end to end. With speakers
-  rather than headphones, the mic picks up the video audio, so some of the video's words
-  land under the local speaker; use headphones. Known limitation: with Soniqo Parakeet
-  Batch the word timings are synthesized, not measured. Only each 29.5 s block's text is
-  kept, and words are laid out from the block start at an estimated pace, so leading
-  silence in a block shifts its words early (playback highlight and click-to-seek drift;
-  text is fine). Check how bad it is over a 30+ minute webinar.
-- **T-BUILD-08** — Dev mode can't hold macOS audio permissions (they go to the launching
-  editor), so "own build" means the ad-hoc-signed bundle (built and in use 2026-11-01). `cargo xtask
-  prepare-binaries` builds the CLI into `resources/cli/`; `tauri build --debug --bundles
-  app` with a `--config` override (ad-hoc signing, no updater artifacts, CLI listed in
-  `externalBin`) keeps upstream files untouched. On launch the app symlinks the CLI to
-  `~/.local/bin/anarlog-dev` (dev identifier). The CLI picks its database by the name
-  it's invoked as (`anarlog-dev` → the dev app's database), so a plain `macalla` symlink
-  would read the wrong one; a `macalla` wrapper must exec `anarlog-dev` or pass
-  `--db-path`. `meetings list` is newest-first.
+- **T-BUILD-06** — The tool is in daily use. What's left is a live webinar, recorded with
+  the floating bar on and the tray icon off. Known limitations to expect: synthesized word
+  timings (playback highlight and click-to-seek drift; text is fine), and far-end bleed
+  into the mic channel when using a speaker rather than headphones. Worth trying on a
+  speaker call: select the speakerphone's own mic, whose hardware echo cancellation
+  should cut the bleed.
 - **T-BUILD-07** — Upstream supports bring-your-own-key transcription providers (Settings
   → Transcription). The key stays in the app's local settings, never in the repo. A
   hosted provider receives the meeting audio. Provider choice and the meaning of
@@ -88,9 +78,13 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
   coding-subagent framework on the same change.
 - Bring in a repo-scanning/query tool before touching the Rust audio or transcription
   internals, if the work gets that deep.
-- Summaries through a local model (Ollama or LM Studio).
+- Summaries through a bigger local model. Apple's on-device model (now selected, runs
+  automatically on every note) has about 4K tokens of context and fails on long meetings
+  (a 48-minute transcript did). Candidate: oMLX's OpenAI-compatible endpoint, never run
+  alongside Ollama. Also consider turning automatic summaries off.
 - Contribute a fix upstream (branch from `main`, never `macalla`).
-- Remove the upsell UI (e.g. "Get Pro" on the Summary tab) from the Macalla build.
+- Remove the upsell UI (e.g. "Get Pro" on the Summary tab) from the Macalla build. Done
+  so far: the app-icon picker is unlocked.
 - Real word timestamps for Soniqo Parakeet batch transcripts: keep the model's own
   timings instead of synthesizing them (`listener2-core` batch/simple/local.rs keeps only
   text; `transcribe-soniqo` responses.rs estimates timing). Upstream-worthy.

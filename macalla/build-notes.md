@@ -109,10 +109,12 @@ direnv exec . cargo xtask prepare-binaries     # CLI + browser helper, release b
 cd apps/desktop && direnv exec . pnpm tauri build --debug --bundles app \
   --features direct-distribution \
   --config '{"bundle":{"createUpdaterArtifacts":false,"externalBin":["binaries/check-permissions","binaries/char-chrome-native-host","resources/cli/anarlog-cli"],"macOS":{"signingIdentity":"-"}}}'
-cd ../.. && codesign --force --sign - --identifier com.hyprnote.dev \
+cd ../.. && B="apps/desktop/src-tauri/target/debug/bundle/macos/Anarlog Dev.app"
+rm -f "$B/Icon"$'\r'; xattr -cr "$B"            # custom-icon file the app writes at launch
+codesign --force --sign - --identifier com.hyprnote.dev \
   --requirements '=designated => identifier "com.hyprnote.dev"' \
   --entitlements apps/desktop/src-tauri/Entitlements.plist \
-  "apps/desktop/src-tauri/target/debug/bundle/macos/Anarlog Dev.app"
+  "$B"
 ```
 
 - `createUpdaterArtifacts: false`: upstream signs updates with a private key we don't have.
@@ -121,6 +123,39 @@ cd ../.. && codesign --force --sign - --identifier com.hyprnote.dev \
   requirement to the identifier (as upstream's dev runner does) keeps grants across builds.
 - Launch from Finder or `open`, never from a terminal, so macOS treats the app as
   responsible for itself. Output: `apps/desktop/src-tauri/target/debug/bundle/macos/`.
+- The app writes a custom Finder icon (`Icon\r` plus a FinderInfo xattr) into its own
+  bundle at launch. `codesign` refuses a bundle carrying it, so clear it before re-signing.
+- Quit the running app before relaunching a new build. `prepare-binaries` is only needed
+  when the CLI changes; frontend or icon changes need just the last two steps.
+- After a rebuild, the first read of the app's keychain entry
+  (`com.anarlog.dev.secure-store`, holds API keys) prompts for the login password.
+  "Always Allow" is safe; with the identifier requirement it shouldn't recur.
+- Debug builds never self-update (`updater2` returns early under `debug_assertions`), so
+  the "Automatically install updates" toggle is harmless here.
+
+## Day-to-day use
+- **CLI:** on launch the app symlinks its CLI to `~/.local/bin/anarlog-dev`. The CLI picks
+  its database by the name it's invoked as, so `macalla` is a wrapper script in
+  `~/.local/bin` that execs `anarlog-dev` (a plain symlink would read the wrong database).
+  `meetings list` is newest-first, with UTC dates.
+- **Transcript to Claude:** `macalla meetings list`, then
+  `macalla meetings export <id> --format markdown -o <file>.md`. `--format json` adds word
+  timings. `meetings transcript` pages at most 500 words (`--offset`).
+- **Floating bar** (red waveform pill, recordings only): Settings → Meetings → "Show
+  floating bar"; reopen it from the note's ⋯ menu → "Open floating panel". Excluded from
+  screen capture: verified invisible to call participants and to screenshots.
+- **Menu-bar (tray) icon** shows the note title and an animated level meter while
+  recording, and *is* visible in a full-screen share (the menu bar appears when the
+  pointer reaches the top). Kept off: Settings → General → "Show tray icon".
+- **Audio:** with a speaker instead of headphones, the far end leaks into the mic channel
+  as garbled extra "Speaker N" lines; the app drops some of it as echo. Untested: a
+  speakerphone's own mic, whose hardware echo cancellation should help.
+- **Summaries:** opening Settings → Intelligence selected Apple's on-device model, and the
+  app then summarizes every note automatically, back-filling old ones. Its context is
+  small (about 4K tokens), so a 48-minute meeting fails; short calls work.
+- **App icon:** Macalla ships Blueprint rotated 180° (`icons/dev`, `resources/dev*`, picker
+  previews) and unlocks the icon picker (`MACALLA_UNLOCK_APP_ICONS` in
+  `settings/appearance/app-icon.tsx`).
 
 ## Blocked: silent cloud fallback for live transcription
 With no live-capable model configured (e.g. Soniqo's model still downloading), upstream

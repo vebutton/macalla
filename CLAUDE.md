@@ -98,7 +98,9 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
   recording a real webinar and transcribing it on the local GPU, with a third-party
   transcription API as the fallback. First test: a recorded webinar played from YouTube
   (same system-audio path). Final check: a live webinar.
-- **Status:** Not started. The fork is set up; T-BUILD-01 is next.
+- **Status:** Working tool in daily use (2026-11-01): bundled app records mic and system
+  audio, transcribes on-device after the recording, CLI exports Markdown. Left: T-BUILD-06
+  (live webinar), T-BUILD-07 (API fallback).
 - **Depends on:** Nothing. This is the first track.
 
 **Further tracks:** None yet. Candidates sit in `TODO.md` → Unscheduled.
@@ -112,24 +114,35 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 
 > Task state is not kept here: open items, progress and recurring work live in `TODO.md`.
 
-**Last:** 2026-10-31. Project scoped and the fork set up: public, `macalla` is the default
-branch, project files committed. No build work yet.
+**Last:** 2026-11-01. Built from source and in daily use: sandboxed toolchain, ad-hoc-signed
+debug bundle, local Soniqo transcription, `macalla` CLI. Removed or blocked the app's
+writes to global coding-agent config and the silent Deepgram fallback. Rotated
+Blueprint icon, icon picker unlocked. T-BUILD-01..05 and -08 closed.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
-   on demand.
-2. T-BUILD-01: install the pinned toolchain (rustup, pnpm, process-compose, Metal
-   Toolchain). Everything else in Track 1 waits on it.
-3. T-BUILD-02: first `pnpm dev:desktop` launch.
+   on demand; `macalla/build-notes.md` has the rebuild steps and day-to-day settings.
+2. Ask whether to push `macalla` to origin (unpushed commits; push only on go-ahead).
+3. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
+   `remove-agent-hook-installer` (local only, not pushed).
+4. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
 
 **Continuity reminders:**
 - The global git email is a work address. The repo-local identity is set, but re-check
   `git config --show-origin user.email` on any fresh clone before committing.
 - Upstream's `.claude/skills/` load into every session here. Never invoke them; they are
   for upstream maintainers.
-- The Homebrew `rust` already on the machine will shadow rustup unless PATH order is
-  fixed. Verify `rustc --version` reports 1.94.0 inside the repo.
-- Node 26 is installed. Upstream CI uses 22; if the build misbehaves, try 22 first.
+- Toolchain is per-repo via direnv (`.envrc`, local-only). Non-interactive shells need
+  `direnv exec . <cmd>`; after editing `.envrc`, run `direnv allow .`. Never link
+  Homebrew rustup, cmake or bash globally.
+- Record only from the bundle (Finder or `open`), never `pnpm dev:desktop`: dev mode
+  attributes audio permissions to the editor. Every rebuild must be re-signed with the
+  identifier requirement or permissions are lost (exact steps in build-notes).
+- Never let the app write to `~/.claude` or other global agent config; it's an absolute
+  requirement. Keep `MACALLA_DISABLE_AGENT_SKILLS` and the removed hook installer.
+- Transcription stays local: Soniqo Parakeet Batch now, oMLX later (Unscheduled). No cloud
+  fallback without an explicit choice (T-BUILD-07).
+- Node 26.0.0 triggers an engine warning (wants ≥26.12.1 or 22/24); harmless so far.
 
 **Session continuity:** Next session is a cold start. Re-read CLAUDE.md before doing
 anything. Sessions are never re-entered. End-of-session updates cover three layers: this
