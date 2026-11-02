@@ -32,6 +32,8 @@ const APP_ICON_OPTIONS = [
   "walnut",
 ] as const satisfies readonly AppIconPreference[];
 
+const MACALLA_UNLOCK_APP_ICONS = true;
+
 const PREVIEW_CLASS =
   "size-16 scale-[1.16] transition-transform duration-150 select-none group-hover:scale-[1.21]";
 
@@ -91,7 +93,9 @@ export function AppIconSelector() {
             resolveAppIconName(option, appIdentifier) === selectedIconName;
           const previewName = resolveAppIconName(option, appIdentifier);
           const hasDarkVariant = hasDarkAppIconVariant(previewName);
-          const locked = !billing.isPro && !selected;
+          // Macalla: every bundled icon is selectable without a plan.
+          const locked =
+            !MACALLA_UNLOCK_APP_ICONS && !billing.isPro && !selected;
 
           return (
             <button
