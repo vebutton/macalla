@@ -109,3 +109,10 @@
 - **A Settings button for the hook installer.** Earlier the agent claimed one existed; no
   UI calls the installer.
 - **Pasting a custom icon via Finder's Get Info:** it would modify the signed bundle.
+
+**Session close (2026-11-01)**
+- `macalla` pushed to origin (level at `e1c132d426` before this closing commit).
+  `remove-agent-hook-installer` remains local-only.
+- Atlas overview created at `.atlas/overview.md` (local-only via `.git/info/exclude`,
+  not `.gitignore`, to keep upstream's file untouched). The project is recorded as a
+  personal tool; one marker (proof screenshots) is left open on purpose.

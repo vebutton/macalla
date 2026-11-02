@@ -122,10 +122,11 @@ Blueprint icon, icon picker unlocked. T-BUILD-01..05 and -08 closed.
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
    on demand; `macalla/build-notes.md` has the rebuild steps and day-to-day settings.
-2. Ask whether to push `macalla` to origin (unpushed commits; push only on go-ahead).
-3. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
+2. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
    `remove-agent-hook-installer` (local only, not pushed).
-4. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
+3. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
+4. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
+   `[NEEDS]` left open by choice (proof screenshots).
 
 **Continuity reminders:**
 - The global git email is a work address. The repo-local identity is set, but re-check
