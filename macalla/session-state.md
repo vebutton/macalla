@@ -116,3 +116,39 @@
 - Atlas overview created at `.atlas/overview.md` (local-only via `.git/info/exclude`,
   not `.gitignore`, to keep upstream's file untouched). The project is recorded as a
   personal tool; one marker (proof screenshots) is left open on purpose.
+
+## 2026-11-05 — Note titles: rename after recording
+
+**Done**
+- **Summary context.** Confirmed the Apple on-device model's 4,096-token window is set by
+  Apple, not by the app: `plugins/local-llm/swift-lib/src/lib.swift` only opens a
+  `LanguageModelSession`, and `maximumResponseTokens` shares the same budget. About 20
+  minutes of speech fits.
+- **Rename after recording (fork-only change).** Upstream hid the header title input once
+  a note had audio or a transcript, and also whenever the Summary/Transcript switcher
+  showed (upstream `97302a87a3`). It now stays visible except while recording or
+  finalizing (`apps/desktop/src/session/components/outer-header/index.tsx`). Tests
+  updated plus one new case; 35/35 pass, typecheck clean. Bundle rebuilt and re-signed;
+  the operator confirmed it works.
+- **How titles work, for reference.** The AI Summary's first line is the session title,
+  synced both ways (`note-input/enhanced/editor.tsx`). That was upstream's only rename
+  path after recording, so notes with a failed or missing summary were stuck on
+  Untitled. Clearing a title on a note with a summary refills it from the summary's
+  first line (`repairMissingSessionTitle`).
+- **Failed summaries after relaunch.** The "failed" status lives in memory
+  (`useAITaskTask`), so relaunching cleared the errors. Those Summary tabs now show only
+  the title line. Nothing was regenerated; a retry would fail the same way.
+
+**Decisions**
+- **Manual titles, not AI titles.** The operator names notes with a date-prefixed scheme
+  and relabels processed notes with a `DONE - ` prefix, so auto-generated titles don't fit.
+- **No auto-filled date prefix:** it would get in the way of the `DONE - ` relabel.
+- **Bigger summary model:** comes from the operator's separate local-model project, not
+  from this repo.
+
+**Ruled out**
+- **Raising Apple's context window:** not configurable.
+- **Chunked (map-reduce) summarisation in the app:** the operator already has other ways
+  to handle long transcripts.
+- **Editing titles directly in the database:** not needed once the UI allows rename, and
+  risky while the app runs.

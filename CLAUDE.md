@@ -114,10 +114,11 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 
 > Task state is not kept here: open items, progress and recurring work live in `TODO.md`.
 
-**Last:** 2026-11-01. Built from source and in daily use: sandboxed toolchain, ad-hoc-signed
-debug bundle, local Soniqo transcription, `macalla` CLI. Removed or blocked the app's
-writes to global coding-agent config and the silent Deepgram fallback. Rotated
-Blueprint icon, icon picker unlocked. T-BUILD-01..05 and -08 closed.
+**Last:** 2026-11-05. Notes can now be renamed after recording: the header title input
+stays visible except while recording (fork-only change, rebuilt, confirmed working).
+Apple's summary model has a fixed 4K context, so a bigger model will come from a separate
+local-model project. Before that (2026-11-01): built from source and in daily use, agent
+config writes and the Deepgram fallback blocked, T-BUILD-01..05 and -08 closed.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
@@ -144,6 +145,11 @@ Blueprint icon, icon picker unlocked. T-BUILD-01..05 and -08 closed.
 - Transcription stays local: Soniqo Parakeet Batch now, oMLX later (Unscheduled). No cloud
   fallback without an explicit choice (T-BUILD-07).
 - Node 26.0.0 triggers an engine warning (wants ≥26.12.1 or 22/24); harmless so far.
+- Titles are manual: the operator relabels processed notes with a `DONE - ` prefix, so
+  don't add AI auto-titling or an auto date prefix. The AI Summary's first line is the
+  same title field as the header.
+- Summary "failed" status is in-memory only; a relaunch clears it and leaves the Summary
+  tab showing just the title. That isn't a fix.
 
 **Session continuity:** Next session is a cold start. Re-read CLAUDE.md before doing
 anything. Sessions are never re-entered. End-of-session updates cover three layers: this

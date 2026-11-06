@@ -79,9 +79,13 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
 - Bring in a repo-scanning/query tool before touching the Rust audio or transcription
   internals, if the work gets that deep.
 - Summaries through a bigger local model. Apple's on-device model (now selected, runs
-  automatically on every note) has about 4K tokens of context and fails on long meetings
-  (a 48-minute transcript did). Candidate: oMLX's OpenAI-compatible endpoint, never run
-  alongside Ollama. Also consider turning automatic summaries off.
+  automatically on every note) has a fixed 4K-token context and fails on long meetings
+  (a 48-minute transcript did). The model will come from the operator's separate
+  local-model project; connect it here as an OpenAI-compatible provider. Never run
+  alongside Ollama. Also consider turning automatic summaries off. In-app chunked
+  summarisation ruled out (2026-11-05).
+- Let the note title be edited while recording too (header input is still hidden while
+  live; one-line change in `outer-header/index.tsx`). Renaming after recording is done.
 - Contribute a fix upstream (branch from `main`, never `macalla`).
 - Remove the upsell UI (e.g. "Get Pro" on the Summary tab) from the Macalla build. Done
   so far: the app-icon picker is unlocked.
