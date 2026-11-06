@@ -1,7 +1,15 @@
 import { i18n } from "@lingui/core";
 import { randomUUID } from "node:crypto";
 import * as React from "react";
-import { vi } from "vitest";
+import { beforeEach, vi } from "vitest";
+
+import { macallaFork } from "./macalla";
+
+// Upstream's suites assume automatic transcription and summaries; Macalla's
+// on-demand tests switch the flag back on themselves.
+beforeEach(() => {
+  macallaFork.onDemandProcessing = false;
+});
 
 // Compiled @lingui/core/macro calls hit the real global i18n; give it a
 // locale so untranslated messages fall back to their English source.

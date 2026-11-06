@@ -43,6 +43,7 @@
 - [ ] T-BUILD-06 Final check: record and transcribe a live webinar
 - [ ] T-BUILD-07 Configure a third-party transcription API as the fallback and confirm it transcribes
 - [x] T-BUILD-08 Build an ad-hoc-signed `.app` bundle with the embedded `anarlog` CLI, and confirm the CLI lists and reads recent meetings (resolved 2026-11-01: bundle in daily use; `macalla` wrapper in `~/.local/bin` lists, reads and exports meetings to Markdown; rebuild steps in `macalla/build-notes.md`)
+- [ ] T-BUILD-09 On-demand transcription and summaries (fork change): nothing runs automatically after a recording, upload or relaunch
 
 ## 2. Item detail
 
@@ -57,6 +58,11 @@
   → Transcription). The key stays in the app's local settings, never in the repo. A
   hosted provider receives the meeting audio. Provider choice and the meaning of
   "fallback" are open questions (section 3).
+- **T-BUILD-09** — Code done, switch `macallaFork.onDemandProcessing` in
+  `apps/desktop/src/macalla.ts`. Left: rebuild, then a manual check. Stop a recording
+  (nothing runs), relaunch (still nothing), Re-transcribe (transcript only), Generate
+  summary (summary). Keeps local transcription and summaries from competing for the GPU.
+  Doesn't apply with audio retention "none" (no saved audio to transcribe later).
 
 ## 3. Open questions
 - Which third-party transcription API is the fallback? Resolves at T-BUILD-07.
@@ -78,12 +84,15 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
   coding-subagent framework on the same change.
 - Bring in a repo-scanning/query tool before touching the Rust audio or transcription
   internals, if the work gets that deep.
-- Summaries through a bigger local model. Apple's on-device model (now selected, runs
-  automatically on every note) has a fixed 4K-token context and fails on long meetings
+- Summaries through a bigger local model. Apple's on-device model (now selected) has a fixed 4K-token context and fails on long meetings
   (a 48-minute transcript did). The model will come from the operator's separate
   local-model project; connect it here as an OpenAI-compatible provider. Never run
-  alongside Ollama. Also consider turning automatic summaries off. In-app chunked
+  alongside Ollama. Automatic summaries go off with T-BUILD-09. In-app chunked
   summarisation ruled out (2026-11-05).
+- Remember the last note view (Summary, Memos or Transcript) when switching notes; today
+  every note opens on the summary. Opened notes start with `view: null`
+  (`store/zustand/tabs/schema.ts`), and `useCurrentNoteTab` (`session/components/shared.tsx`)
+  then falls back to the first summary. Small fork change; next after T-BUILD-09.
 - Let the note title be edited while recording too (header input is still hidden while
   live; one-line change in `outer-header/index.tsx`). Renaming after recording is done.
 - Contribute a fix upstream (branch from `main`, never `macalla`).

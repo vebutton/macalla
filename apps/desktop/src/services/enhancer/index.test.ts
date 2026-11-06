@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EnhancerService } from ".";
 
+import { macallaFork } from "~/macalla";
+
 const mocks = vi.hoisted(() => ({
   analyticsEvent: vi.fn().mockResolvedValue(undefined),
   loadSessionContentSnapshot: vi.fn(),
@@ -796,6 +798,33 @@ describe("EnhancerService", () => {
     expect(ai.generate).toHaveBeenCalledOnce();
     service.dispose();
     consoleError.mockRestore();
+  });
+
+  it("on-demand mode ignores automatic requests but generates when asked", async () => {
+    vi.useFakeTimers();
+    macallaFork.onDemandProcessing = true;
+    snapshot = createSnapshot({ wordCount: 40 });
+    mocks.loadPendingAutoEnhanceJobs.mockResolvedValue([createPendingJob()]);
+    const ai = createMockAITaskStore();
+    const service = new EnhancerService(createDeps({ aiTaskStore: ai.store }));
+
+    service.start();
+    await service.requestAutoEnhance("session-1", "regenerate");
+    await expect(
+      service.queueAutoEnhanceIfSummaryEmpty("session-1"),
+    ).resolves.toEqual({ type: "on_demand" });
+    await vi.advanceTimersByTimeAsync(11_000);
+
+    expect(mocks.loadPendingAutoEnhanceJobs).not.toHaveBeenCalled();
+    expect(mocks.ensurePendingAutoEnhanceDocument).not.toHaveBeenCalled();
+    expect(ai.generate).not.toHaveBeenCalled();
+
+    await expect(service.enhance("session-1")).resolves.toEqual({
+      type: "started",
+      noteId: "note-1",
+    });
+    expect(ai.generate).toHaveBeenCalledOnce();
+    service.dispose();
   });
 
   it("retries a durable job when the model becomes ready", async () => {

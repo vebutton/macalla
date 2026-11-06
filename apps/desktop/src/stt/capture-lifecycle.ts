@@ -18,6 +18,7 @@ import {
   completeCaptureTranscript,
   loadCaptureStop,
   saveCaptureStop,
+  stampSessionCaptureInterval,
 } from "./capture-completion";
 import {
   saveIncompleteCapture,
@@ -42,6 +43,7 @@ import { requestMainAutoEnhance } from "~/ai/task-window-sync";
 import { trackAnalyticsEvent } from "~/analytics";
 import { useAuth } from "~/auth";
 import { releaseCloudsyncActivityEventually } from "~/db/cloudsync-activity";
+import { macallaFork } from "~/macalla";
 import {
   deleteProcessedAudioForRetention,
   normalizeAudioRetention,
@@ -981,9 +983,20 @@ export function useCaptureLifecycle(sessionId: string) {
               refineSpeakerDiarization,
               transcriptWriteFailed: Boolean(transcriptWriteError),
             });
+        // Macalla on-demand: leave the saved recording for Re-transcribe.
+        // The capture still finishes cleanly so recovery won't transcribe it
+        // later, and the audio stays marked as awaiting transcription, which
+        // keeps the retention sweep from deleting it.
+        const transcriptionDeferred =
+          macallaFork.onDemandProcessing &&
+          retainAudio &&
+          postCaptureAction === "batch_then_enhance";
 
         let batchCompleted = false;
-        if (postCaptureAction === "batch_then_enhance") {
+        if (
+          postCaptureAction === "batch_then_enhance" &&
+          !transcriptionDeferred
+        ) {
           updateBatchTranscriptionPending(true);
           console.info("[listener] starting post-stop transcript repair", {
             sessionId,
@@ -1104,7 +1117,7 @@ export function useCaptureLifecycle(sessionId: string) {
           batchCompleted ||
           postCaptureAction === "enhance_only" ||
           emptyFreshCapture;
-        if (!transcriptIsComplete) {
+        if (!transcriptIsComplete && !transcriptionDeferred) {
           trackAnalyticsEvent("transcription_failed", {
             mode: "live",
             failure_stage: "persist",
@@ -1145,6 +1158,11 @@ export function useCaptureLifecycle(sessionId: string) {
         if (stoppedAtMs !== null && hasTranscriptEvidence) {
           await persistTranscriptWrite(() =>
             completeCaptureTranscript(sessionId, transcriptId, stoppedAtMs),
+          );
+        }
+        if (stoppedAtMs !== null && transcriptionDeferred) {
+          await persistTranscriptWrite(() =>
+            stampSessionCaptureInterval(sessionId, startedAt, stoppedAtMs),
           );
         }
         if (!details.needsBatchRepair) {
@@ -1220,7 +1238,7 @@ export function useCaptureLifecycle(sessionId: string) {
         const recoveryComplete =
           !retainAudio ||
           (!details.audioPath && !transcriptWriteError) ||
-          (transcriptIsComplete && summaryScheduled);
+          ((transcriptIsComplete || transcriptionDeferred) && summaryScheduled);
         if (!recoveryComplete) {
           await requestRecovery();
           return;

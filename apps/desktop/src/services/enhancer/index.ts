@@ -16,6 +16,7 @@ import {
 
 import { trackAnalyticsEvent } from "~/analytics";
 import { retryDatabaseLock } from "~/db/retry";
+import { macallaFork } from "~/macalla";
 import {
   loadSessionContentSnapshot,
   type SessionContentSnapshot,
@@ -36,7 +37,8 @@ type EnhanceResult =
 
 type QueueEmptySummaryResult =
   | { type: "queued" }
-  | { type: "summary_exists"; noteId: string };
+  | { type: "summary_exists"; noteId: string }
+  | { type: "on_demand" };
 
 // "refresh" regenerates an existing summary and otherwise behaves like "if_empty".
 export type AutoEnhanceMode = "regenerate" | "if_empty" | "refresh";
@@ -193,6 +195,7 @@ export class EnhancerService {
   async queueAutoEnhanceIfSummaryEmpty(
     sessionId: string,
   ): Promise<QueueEmptySummaryResult> {
+    if (macallaFork.onDemandProcessing) return { type: "on_demand" };
     return retryDatabaseLock(async () => {
       const snapshot = await this.loadSession(sessionId);
       const templateId = resolveTemplateId(
@@ -229,6 +232,7 @@ export class EnhancerService {
   }
 
   async requestAutoEnhance(sessionId: string, mode: AutoEnhanceMode) {
+    if (macallaFork.onDemandProcessing) return;
     if (mode === "refresh" && !(await this.hasGeneratingSummary(sessionId))) {
       const result = await this.queueAutoEnhanceIfSummaryEmpty(sessionId);
       if (result.type !== "summary_exists") return;
@@ -281,6 +285,7 @@ export class EnhancerService {
   }
 
   private async resumePendingAutoEnhance() {
+    if (macallaFork.onDemandProcessing) return;
     try {
       const jobs = await retryDatabaseLock(loadPendingAutoEnhanceJobs);
       if (!this.started) return;

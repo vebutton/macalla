@@ -126,3 +126,35 @@ export function completeCaptureTranscript(
     ]);
   });
 }
+
+// Macalla on-demand: a recording left untranscribed has no transcript for
+// completeCaptureTranscript to stamp, so record the capture times on the
+// session directly. Same rules: keep an earlier start, take this stop.
+export function stampSessionCaptureInterval(
+  sessionId: string,
+  startedAtMs: number,
+  stoppedAtMs: number,
+): Promise<void> {
+  if (
+    !Number.isSafeInteger(startedAtMs) ||
+    !Number.isSafeInteger(stoppedAtMs) ||
+    startedAtMs <= 0 ||
+    stoppedAtMs < startedAtMs
+  ) {
+    return Promise.reject(new Error("Invalid capture interval"));
+  }
+  return enqueueDatabaseWrite(`session:${sessionId}`, async () => {
+    await executeTransaction([
+      {
+        sql: `UPDATE sessions
+          SET started_at = CASE WHEN started_at = '' THEN
+                strftime('%Y-%m-%dT%H:%M:%fZ', ? / 1000.0, 'unixepoch')
+                ELSE started_at END,
+              ended_at = strftime('%Y-%m-%dT%H:%M:%fZ', ? / 1000.0, 'unixepoch'),
+              updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+          WHERE id = ? AND deleted_at IS NULL`,
+        params: [startedAtMs, stoppedAtMs, sessionId],
+      },
+    ]);
+  });
+}

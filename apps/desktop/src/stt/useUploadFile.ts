@@ -18,6 +18,7 @@ import { ChannelProfile } from "./segment";
 import { isStoppedTranscriptionError, useRunBatch } from "./useRunBatch";
 
 import { withCloudsyncActivity } from "~/db/cloudsync-activity";
+import { macallaFork } from "~/macalla";
 import { getEnhancerService } from "~/services/enhancer";
 import { catalogLocalSessionAudio } from "~/session/attachments";
 import { enqueueSessionAudioOperation } from "~/session/audio-operations";
@@ -67,6 +68,7 @@ export function useUploadFile(sessionId: string) {
   const updateSession = useUpdateSession(sessionId);
 
   const triggerEnhance = useCallback(async () => {
+    if (macallaFork.onDemandProcessing) return;
     const service = getEnhancerService();
     if (!service) return;
 

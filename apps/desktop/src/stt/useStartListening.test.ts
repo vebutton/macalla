@@ -10,6 +10,7 @@ import {
   completeCaptureTranscript,
   loadCaptureStop,
   saveCaptureStop,
+  stampSessionCaptureInterval,
 } from "./capture-completion";
 import { saveIncompleteCapture } from "./capture-result";
 import {
@@ -22,12 +23,14 @@ import {
   useStartListeningState,
 } from "./useStartListening";
 
+import { macallaFork } from "~/macalla";
 import { enqueueSessionAudioOperation } from "~/session/audio-operations";
 
 vi.mock("./capture-completion", () => ({
   completeCaptureTranscript: vi.fn().mockResolvedValue(undefined),
   loadCaptureStop: vi.fn().mockResolvedValue(null),
   saveCaptureStop: vi.fn().mockResolvedValue(undefined),
+  stampSessionCaptureInterval: vi.fn().mockResolvedValue(undefined),
 }));
 
 const {
@@ -1702,6 +1705,42 @@ describe("useStartListening", () => {
     ).toBeLessThan(
       deleteProcessedAudioForRetentionMock.mock.invocationCallOrder[0]!,
     );
+  });
+
+  test("on-demand mode keeps a record-only capture for Re-transcribe instead of processing it", async () => {
+    macallaFork.onDemandProcessing = true;
+    const stoppedAtMs = Date.now() + 60_000;
+    vi.mocked(loadCaptureStop).mockResolvedValueOnce(stoppedAtMs);
+    const { result } = renderHook(() => useStartListening("session-1"));
+
+    await act(async () => {
+      await result.current();
+    });
+
+    await act(async () => {
+      await startMock.mock.calls[0]?.[1]?.onStopped?.("session-1", {
+        durationSeconds: 42,
+        audioPath: "/tmp/session.wav",
+        requestedLiveTranscription: false,
+        liveTranscriptionActive: false,
+        needsBatchRepair: false,
+      });
+    });
+
+    expect(runBatchMock).not.toHaveBeenCalled();
+    expect(requestAutoEnhanceMock).not.toHaveBeenCalled();
+    expect(queueAutoEnhanceIfSummaryEmptyMock).not.toHaveBeenCalled();
+    // Finished cleanly: no recovery pass will transcribe it later.
+    expect(requestCaptureRecoveryMock).not.toHaveBeenCalled();
+    expect(clearCaptureLifecycleMarkerMock).toHaveBeenCalled();
+    expect(stampSessionCaptureInterval).toHaveBeenCalledWith(
+      "session-1",
+      expect.any(Number),
+      stoppedAtMs,
+    );
+    // Audio stays marked as awaiting transcription, so retention keeps it.
+    expect(markSessionAudioTranscriptionCompleteMock).not.toHaveBeenCalled();
+    expect(deleteProcessedAudioForRetentionMock).not.toHaveBeenCalled();
   });
 
   test("refines complete multi-speaker Pro transcripts after stop", async () => {
