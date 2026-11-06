@@ -77,8 +77,10 @@ export function OuterHeader({
     sessionMode === "active" || sessionMode === "running_batch";
   const isLiveMeeting = isRecording || sessionMode === "finalizing";
   const meetingOver = !isRecording && (ended || hasTranscript || audioExists);
-  const showTitleInput =
-    Boolean(tab) && !viewSwitcher && !isLiveMeeting && !meetingOver;
+  // Macalla: keep the title editable after a recording (and beside the view
+  // switcher) so a quickly started note can be renamed later. Upstream hid it
+  // once a meeting ended and relied on AI-generated titles.
+  const showTitleInput = Boolean(tab) && !isLiveMeeting;
 
   return (
     <div
