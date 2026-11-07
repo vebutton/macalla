@@ -43,7 +43,7 @@
 - [ ] T-BUILD-06 Final check: record and transcribe a live webinar
 - [ ] T-BUILD-07 Configure a third-party transcription API as the fallback and confirm it transcribes
 - [x] T-BUILD-08 Build an ad-hoc-signed `.app` bundle with the embedded `anarlog` CLI, and confirm the CLI lists and reads recent meetings (resolved 2026-11-01: bundle in daily use; `macalla` wrapper in `~/.local/bin` lists, reads and exports meetings to Markdown; rebuild steps in `macalla/build-notes.md`)
-- [ ] T-BUILD-09 On-demand transcription and summaries (fork change): nothing runs automatically after a recording, upload or relaunch
+- [x] T-BUILD-09 On-demand transcription and summaries (fork change): nothing runs automatically after a recording, upload or relaunch (resolved 2026-11-07: switch in `apps/desktop/src/macalla.ts`; Re-transcribe and Generate summary on demand; post-stop view fix `8576136607` built and confirmed. Doesn't apply with audio retention "none")
 
 ## 2. Item detail
 
@@ -58,15 +58,6 @@
   → Transcription). The key stays in the app's local settings, never in the repo. A
   hosted provider receives the meeting audio. Provider choice and the meaning of
   "fallback" are open questions (section 3).
-- **T-BUILD-09** — Switch `macallaFork.onDemandProcessing` in
-  `apps/desktop/src/macalla.ts`. Confirmed in the app: nothing runs after a stop,
-  Re-transcribe and Generate summary work on demand. One quirk left: right after a stop
-  the note looks blank (no Memos/Transcript switcher, templates shown) until you open
-  another note and come back. Commit `8576136607` (refresh the audio checks when a
-  capture ends) is meant for this but isn't built yet. Next: rebuild, re-sign, and check
-  whether the quirk is gone; close if so. Screenshots: `collateral/20261106 minor UI bug/`.
-  Keeps local transcription and summaries from competing for the GPU. Doesn't apply with
-  audio retention "none" (no saved audio to transcribe later).
 
 ## 3. Open questions
 - Which third-party transcription API is the fallback? Resolves at T-BUILD-07.
@@ -99,7 +90,7 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
 - Remember the last note view (Summary, Memos or Transcript) when switching notes; today
   every note opens on the summary. Opened notes start with `view: null`
   (`store/zustand/tabs/schema.ts`), and `useCurrentNoteTab` (`session/components/shared.tsx`)
-  then falls back to the first summary. Small fork change; next after T-BUILD-09.
+  then falls back to the first summary. Small fork change; next up (T-BUILD-10 to be agreed).
 - Let the note title be edited while recording too (header input is still hidden while
   live; one-line change in `outer-header/index.tsx`). Renaming after recording is done.
 - Contribute a fix upstream (branch from `main`, never `macalla`).

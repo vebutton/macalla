@@ -236,6 +236,10 @@
   `@ai-sdk/openai-compatible` 2.0.41 passes unknown provider options into the request
   body, so an "Off" option sending `chat_template_kwargs.enable_thinking: false` would be
   a few lines in `src/ai/reasoning-effort.ts`. Not done.
+- **T-BUILD-09 closed.** Rebuilt the debug bundle (frontend-only change, so no
+  `prepare-binaries`; Rust incremental 36 s) and re-signed with the identifier
+  requirement. The operator confirmed a stopped recording shows the Memos/Transcript
+  switcher immediately, so `8576136607` fixed the post-stop quirk.
 - **Report back** to the other project written to local-only `collateral/` (20261107).
 
 **Decisions**
@@ -254,4 +258,4 @@
 
 **Session close (2026-11-07)**
 - Committed TODO, build notes, this file and the CLAUDE.md brief (`b8efc8e9e0`), then the
-  Qwen 3.5 default as a follow-up commit. Not pushed.
+  Qwen 3.5 default and the T-BUILD-09 close as follow-up commits. Not pushed.

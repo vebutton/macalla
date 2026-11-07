@@ -99,9 +99,9 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
   transcription API as the fallback. First test: a recorded webinar played from YouTube
   (same system-audio path). Final check: a live webinar.
 - **Status:** Working tool in daily use (2026-11-01): bundled app records mic and system
-  audio, transcribes on-device on demand (2026-11-06), CLI exports Markdown. Left:
-  T-BUILD-06 (live webinar), T-BUILD-07 (API fallback), T-BUILD-09 (rebuild and confirm
-  the post-stop view fix).
+  audio, transcribes on-device on demand (T-BUILD-09, closed 2026-11-07), summarizes
+  via oMLX, CLI exports Markdown. Left: T-BUILD-06 (live webinar), T-BUILD-07 (API
+  fallback).
 - **Depends on:** Nothing. This is the first track.
 
 **Further tracks:** None yet. Candidates sit in `TODO.md` → Unscheduled.
@@ -118,29 +118,25 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 **Last:** 2026-11-07. Summaries now run through oMLX, using the built-in **Custom** LLM
 provider. No code change was needed (setup in build-notes → Day-to-day use). Tested
 with LFM2: it streams and works, but quality is about 5/10. **Default summary model is
-now Qwen 3.5 on oMLX** (the oMLX service is always up). Decided: no chunking; accurate long-meeting summaries go off-machine
-when needed; transcription stays on Soniqo Parakeet; thinking stays on by default.
-Before that (2026-11-06): on-demand transcription and summaries (T-BUILD-09), with one
-post-stop view fix committed but not built.
+now Qwen 3.5 on oMLX** (the oMLX service is always up). Decided: no chunking;
+accurate long-meeting summaries go off-machine when needed; transcription stays on
+Soniqo Parakeet; thinking stays on by default. **T-BUILD-09 closed:** rebuilt and
+re-signed, and a stopped recording now shows the switcher straight away.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
    on demand; `macalla/build-notes.md` has the rebuild steps and day-to-day settings.
-2. T-BUILD-09: rebuild and re-sign (commit `8576136607` isn't in the current bundle;
-   the app must be quit first, and the operator may need to quit it by hand). Then
-   check that a stopped recording shows the Memos/Transcript switcher without switching
-   notes. Close T-BUILD-09 if it does.
-3. Next fork change: remember the last note view (TODO.md → Unscheduled). Propose
+2. Next fork change: remember the last note view (TODO.md → Unscheduled). Propose
    T-BUILD-10 and agree it before starting.
-4. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
+3. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
    `remove-agent-hook-installer` (local only, not pushed).
-5. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
+4. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
    T-BUILD-07 is about *transcription*; off-machine *summaries* are already allowed
    per meeting.
-6. Summary model testing is the operator's to drive. If asked, the small fork options
+5. Summary model testing is the operator's to drive. If asked, the small fork options
    are a `max_tokens` cap and a thinking "Off" switch (TODO.md → Unscheduled). Propose
    an ID before starting either.
-7. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
+6. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
    `[NEEDS]` left open by choice (proof screenshots).
 
 **Continuity reminders:**
