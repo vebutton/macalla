@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import React, { useEffect, useRef } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -104,6 +104,21 @@ function UnlockedTabContentNote({
 }) {
   const sessionMode = useListener((state) => state.getSessionMode(tab.id));
   const audioExists = AudioPlayer.useAudioExists(tab.id);
+  const queryClient = useQueryClient();
+  const capturing = sessionMode === "active" || sessionMode === "finalizing";
+  const wasCapturingRef = useRef(capturing);
+  // A capture that just ended has written its recording. When no transcript
+  // follows (on-demand processing, or record-only), nothing else re-checks
+  // the audio, so Re-transcribe and the player would stay hidden.
+  useEffect(() => {
+    const captureEnded = wasCapturingRef.current && !capturing;
+    wasCapturingRef.current = capturing;
+    if (!captureEnded) return;
+    void queryClient.invalidateQueries({
+      queryKey: ["audio", tab.id, "exist"],
+    });
+    void queryClient.invalidateQueries({ queryKey: ["audio", tab.id, "url"] });
+  }, [capturing, queryClient, tab.id]);
 
   const audioUrlQuery = useQuery({
     enabled: sessionMode !== "active" && sessionMode !== "finalizing",
