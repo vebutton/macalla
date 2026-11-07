@@ -115,14 +115,13 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 
 > Task state is not kept here: open items, progress and recurring work live in `TODO.md`.
 
-**Last:** 2026-11-06. Transcription and summaries are now on demand (T-BUILD-09, fork
-switch in `apps/desktop/src/macalla.ts`); confirmed in the app. One post-stop view quirk
-is left, with a fix committed but not built. Also wrote a sample summary prompt for the
-operator's model testing (`collateral/20261106-enhance-prompt-sample.md`). Results so far:
-local Qwen and Gemma summaries are below the 8/10 key-facts bar against Claude Opus
-(best 7.5). That work belongs to the separate local-model project, not here. Before that
-(2026-11-05): notes can be renamed after recording; Apple's summary model has a fixed 4K
-context.
+**Last:** 2026-11-07. Summaries now run through oMLX, using the built-in **Custom** LLM
+provider. No code change was needed (setup in build-notes → Day-to-day use). Tested
+with LFM2: it streams and works, but quality is about 5/10. The operator is now trying
+models and prompts. Decided: no chunking; accurate long-meeting summaries go off-machine
+when needed; transcription stays on Soniqo Parakeet; thinking stays on by default.
+Before that (2026-11-06): on-demand transcription and summaries (T-BUILD-09), with one
+post-stop view fix committed but not built.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
@@ -136,7 +135,12 @@ context.
 4. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
    `remove-agent-hook-installer` (local only, not pushed).
 5. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
-6. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
+   T-BUILD-07 is about *transcription*; off-machine *summaries* are already allowed
+   per meeting.
+6. Summary model testing is the operator's to drive. If asked, the small fork options
+   are a `max_tokens` cap and a thinking "Off" switch (TODO.md → Unscheduled). Propose
+   an ID before starting either.
+7. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
    `[NEEDS]` left open by choice (proof screenshots).
 
 **Continuity reminders:**
@@ -152,8 +156,11 @@ context.
   identifier requirement or permissions are lost (exact steps in build-notes).
 - Never let the app write to `~/.claude` or other global agent config; it's an absolute
   requirement. Keep `MACALLA_DISABLE_AGENT_SKILLS` and the removed hook installer.
-- Transcription stays local: Soniqo Parakeet Batch now, oMLX later (Unscheduled). No cloud
-  fallback without an explicit choice (T-BUILD-07).
+- Transcription stays local on Soniqo Parakeet Batch (it keeps speaker labels; oMLX
+  speech is consolidation-only, Unscheduled). No cloud transcription fallback without an
+  explicit choice (T-BUILD-07). Summaries may go off-machine, chosen per meeting.
+- oMLX needs its API key (never in the repo) and must never run alongside Ollama. It
+  ignores the app's Reasoning effort setting.
 - Node 26.0.0 triggers an engine warning (wants ≥26.12.1 or 22/24); harmless so far.
 - Titles are manual: the operator relabels processed notes with a `DONE - ` prefix, so
   don't add AI auto-titling or an auto date prefix. The AI Summary's first line is the

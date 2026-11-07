@@ -88,11 +88,13 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
   coding-subagent framework on the same change.
 - Bring in a repo-scanning/query tool before touching the Rust audio or transcription
   internals, if the work gets that deep.
-- Summaries through a bigger local model. Apple's on-device model (now selected) has a fixed 4K-token context and fails on long meetings
-  (a 48-minute transcript did). The model will come from the operator's separate
-  local-model project; connect it here as an OpenAI-compatible provider. Never run
-  alongside Ollama. Automatic summaries go off with T-BUILD-09. In-app chunked
-  summarisation ruled out (2026-11-05).
+- Better local summary models. Connected: oMLX through the built-in **Custom** LLM
+  provider (settings only, see `macalla/build-notes.md`). Left: the operator is trying
+  models and prompts; none tried so far is trustworthy (LFM2-2.6B about 5/10). Accurate
+  summaries of long meetings go to an off-machine model, chosen per meeting; no chunking.
+  Possible small fork changes if wanted: a `max_tokens` cap for non-Anthropic providers,
+  and a thinking "Off" option (`chat_template_kwargs.enable_thinking`, in
+  `src/ai/reasoning-effort.ts`). Never run alongside Ollama.
 - Remember the last note view (Summary, Memos or Transcript) when switching notes; today
   every note opens on the summary. Opened notes start with `view: null`
   (`store/zustand/tabs/schema.ts`), and `useCurrentNoteTab` (`session/components/shared.tsx`)
@@ -109,6 +111,8 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
   machine on the home network; both count as local) so one model serves every tool. Needs
   an adapter change: today any localhost URL is treated as Deepgram-compatible. Live
   transcription would come from another project once proven on the target hardware.
+  Consolidation only, not accuracy: Soniqo Parakeet stays, and oMLX's endpoint would
+  drop speaker labels.
 - Start/stop recording from a script (e.g. an `anarlog://` deep link callable with `open`),
   a candidate for the small-change learning item above. First check whether calendar-based
   "Start when meeting begins" / "Stop when meeting ends" already covers webinars (auto-stop

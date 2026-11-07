@@ -150,9 +150,22 @@ codesign --force --sign - --identifier com.hyprnote.dev \
 - **Audio:** with a speaker instead of headphones, the far end leaks into the mic channel
   as garbled extra "Speaker N" lines; the app drops some of it as echo. Untested: a
   speakerphone's own mic, whose hardware echo cancellation should help.
-- **Summaries:** opening Settings → Intelligence selected Apple's on-device model, and the
-  app then summarizes every note automatically, back-filling old ones. Its context is
-  small (about 4K tokens), so a 48-minute meeting fails; short calls work.
+- **Summaries** run on demand (Generate summary, T-BUILD-09) with whichever LLM is
+  selected in Settings → AI → LLM.
+  - **Apple's on-device model:** context is small (about 4K tokens), so a 48-minute
+    meeting fails; short calls work.
+  - **oMLX (local server):** provider **Custom**, Base URL `http://127.0.0.1:8000/v1`
+    (with `/v1`, no trailing slash), API key = the oMLX key (kept in the app, never in
+    the repo), model from the dropdown. No code change needed: the localhost→Deepgram
+    rule applies only to transcription. Streams progressively. Restart oMLX first if a
+    big model is still loaded, and don't Re-transcribe while it's summarizing.
+  - **Reasoning effort** does nothing with oMLX (it ignores `reasoning_effort`).
+    Thinking models think by default.
+  - **Format check is shallow:** only the first ~30 characters are validated (a `# `
+    heading, matching the template's first section if one is set). Drift later in the
+    summary never triggers a retry.
+  - The app sends no `max_tokens` except to Anthropic, so a runaway answer stops only at
+    the server's limit. An empty response with HTTP 200 (oMLX's memory guard) is untested.
 - **App icon:** Macalla ships Blueprint rotated 180° (`icons/dev`, `resources/dev*`, picker
   previews) and unlocks the icon picker (`MACALLA_UNLOCK_APP_ICONS` in
   `settings/appearance/app-icon.tsx`).

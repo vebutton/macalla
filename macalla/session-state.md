@@ -214,3 +214,40 @@
 - `macalla` pushed to origin, including `6ba76ed5c6` and `8576136607`.
 - Full desktop suite from `apps/desktop`: 4221 pass, 3 pre-existing failures (billing 2,
   app-icon 1), confirmed failing without this session's changes.
+
+## 2026-11-07 — Summaries through oMLX
+
+**Done**
+- **oMLX connected for summaries, no code change.** The operator's other project handed
+  over an interface test (local-only `collateral/20261107-macalla-omlx-lfm2-handoff.md`)
+  that expected the localhost→Deepgram routing to block it. That rule is
+  transcription-only. Summaries go through the LLM provider list, whose **Custom**
+  provider is `createOpenAICompatible` with base URL plus Bearer key
+  (`src/ai/hooks/useLLMConnection.ts`, default branch). The Tauri HTTP allowlist already
+  covers `http://*.*.*.*:*/**`; model-name filters don't hide "Transcript" names (they
+  block "transcribe"). Setup in `macalla/build-notes.md` → Day-to-day use.
+- **Test with LFM2-2.6B:** worked, streamed progressively, no format error or retry.
+  Claude scored the summary about 5/10, in line with the other project's 4–5.5.
+- **Format check is early-only** (`shared/validate.ts`, `enhance-validator.ts`): first
+  ~30 characters, strips any preamble before `#`, requires `# `, fuzzy-matches the
+  template's first section title. That's why LFM2's mid-document drift caused no retry.
+- **Thinking:** the Reasoning effort dropdown sends `reasoning_effort` for Custom; the
+  operator confirmed oMLX ignores it and thinking models think by default (wanted).
+  `@ai-sdk/openai-compatible` 2.0.41 passes unknown provider options into the request
+  body, so an "Off" option sending `chat_template_kwargs.enable_thinking: false` would be
+  a few lines in `src/ai/reasoning-effort.ts`. Not done.
+- **Report back** to the other project written to local-only `collateral/` (20261107).
+
+**Decisions**
+- **No chunked-summarisation test.** Long meetings that need an accurate summary go to an
+  off-machine model, chosen per meeting. Transcription stays local.
+- **Transcription stays on Soniqo Parakeet.** oMLX would run the same or a weaker model
+  (Whisper), and its OpenAI transcription endpoint has no diarization, so speaker labels
+  would be lost. oMLX speech stays an Unscheduled consolidation idea.
+- **Thinking stays on by default;** no fork change for it.
+
+**Ruled out**
+- Chunk-and-merge (in-app was already out on 2026-11-05; the proxy idea was dropped too).
+
+**Session close (2026-11-07)**
+- Committed TODO, build notes, this file and the CLAUDE.md brief. Not pushed.
