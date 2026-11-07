@@ -258,4 +258,4 @@
 
 **Session close (2026-11-07)**
 - Committed TODO, build notes, this file and the CLAUDE.md brief (`b8efc8e9e0`), then the
-  Qwen 3.5 default and the T-BUILD-09 close as follow-up commits. Not pushed.
+  Qwen 3.5 default and the T-BUILD-09 close as follow-up commits. Pushed to origin.
