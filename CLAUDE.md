@@ -118,7 +118,9 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 **Last:** 2026-11-06. Transcription and summaries are now on demand (T-BUILD-09, fork
 switch in `apps/desktop/src/macalla.ts`); confirmed in the app. One post-stop view quirk
 is left, with a fix committed but not built. Also wrote a sample summary prompt for the
-operator's model testing (`collateral/20261106-enhance-prompt-sample.md`). Before that
+operator's model testing (`collateral/20261106-enhance-prompt-sample.md`). Results so far:
+local Qwen and Gemma summaries are below the 8/10 key-facts bar against Claude Opus
+(best 7.5). That work belongs to the separate local-model project, not here. Before that
 (2026-11-05): notes can be renamed after recording; Apple's summary model has a fixed 4K
 context.
 

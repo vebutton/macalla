@@ -167,6 +167,11 @@
   the operator's oMLX tests. Questions about template, custom format, dictionary terms,
   session line and speaker labels were asked and not answered. Dropped deliberately
   unless the operator returns to them.
+- **Model test results (from the operator's other project).** With this prompt, local
+  Qwen and Gemma summaries have not passed the 8/10 key-facts bar against Claude Opus;
+  the best scored 7.5. Debugging belongs to that project. One possible factor raised
+  here: the prompt carries upstream's length cap (2–8 sections, output no longer than
+  the transcript), tuned for Apple's 4K model.
 - **GPU contention, answered.** Soniqo runs through one Swift actor, so transcriptions
   are effectively serialized; summaries (Apple's model) have no global lock and can
   overlap a transcription. A new recording can start while another note processes.
@@ -206,6 +211,6 @@
 - Summary jobs left pending by earlier back-fills stay idle.
 
 **Session close (2026-11-06)**
-- `6ba76ed5c6`, `8576136607` and the close commit are local on `macalla`, not pushed.
+- `6ba76ed5c6`, `8576136607` and the close commits are local on `macalla`, not pushed.
 - Full desktop suite from `apps/desktop`: 4221 pass, 3 pre-existing failures (billing 2,
   app-icon 1), confirmed failing without this session's changes.
