@@ -159,6 +159,8 @@ codesign --force --sign - --identifier com.hyprnote.dev \
     the repo), model from the dropdown. No code change needed: the localhost→Deepgram
     rule applies only to transcription. Streams progressively. Restart oMLX first if a
     big model is still loaded, and don't Re-transcribe while it's summarizing.
+    **Default summary model: Qwen 3.5** (from 2026-11-07). If oMLX is down, Generate
+    summary fails with no fallback; switch to Apple until it's back.
   - **Reasoning effort** does nothing with oMLX (it ignores `reasoning_effort`).
     Thinking models think by default.
   - **Format check is shallow:** only the first ~30 characters are validated (a `# `

@@ -117,8 +117,8 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 
 **Last:** 2026-11-07. Summaries now run through oMLX, using the built-in **Custom** LLM
 provider. No code change was needed (setup in build-notes → Day-to-day use). Tested
-with LFM2: it streams and works, but quality is about 5/10. The operator is now trying
-models and prompts. Decided: no chunking; accurate long-meeting summaries go off-machine
+with LFM2: it streams and works, but quality is about 5/10. **Default summary model is
+now Qwen 3.5 on oMLX** (the oMLX service is always up). Decided: no chunking; accurate long-meeting summaries go off-machine
 when needed; transcription stays on Soniqo Parakeet; thinking stays on by default.
 Before that (2026-11-06): on-demand transcription and summaries (T-BUILD-09), with one
 post-stop view fix committed but not built.

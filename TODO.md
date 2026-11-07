@@ -89,8 +89,9 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
 - Bring in a repo-scanning/query tool before touching the Rust audio or transcription
   internals, if the work gets that deep.
 - Better local summary models. Connected: oMLX through the built-in **Custom** LLM
-  provider (settings only, see `macalla/build-notes.md`). Left: the operator is trying
-  models and prompts; none tried so far is trustworthy (LFM2-2.6B about 5/10). Accurate
+  provider (settings only, see `macalla/build-notes.md`). Default model: Qwen 3.5 (best
+  so far, about 7.5/10; LFM2-2.6B about 5/10). Left: the operator may keep trying models
+  and prompts. Accurate
   summaries of long meetings go to an off-machine model, chosen per meeting; no chunking.
   Possible small fork changes if wanted: a `max_tokens` cap for non-Anthropic providers,
   and a thinking "Off" option (`chat_template_kwargs.enable_thinking`, in

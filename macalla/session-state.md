@@ -245,9 +245,13 @@
   (Whisper), and its OpenAI transcription endpoint has no diarization, so speaker labels
   would be lost. oMLX speech stays an Unscheduled consolidation idea.
 - **Thinking stays on by default;** no fork change for it.
+- **Default summary model: Qwen 3.5 on oMLX,** which now runs as an always-on service.
+  Apple's model is the fallback when oMLX is down (manual switch; the app has no
+  automatic fallback).
 
 **Ruled out**
 - Chunk-and-merge (in-app was already out on 2026-11-05; the proxy idea was dropped too).
 
 **Session close (2026-11-07)**
-- Committed TODO, build notes, this file and the CLAUDE.md brief. Not pushed.
+- Committed TODO, build notes, this file and the CLAUDE.md brief (`b8efc8e9e0`), then the
+  Qwen 3.5 default as a follow-up commit. Not pushed.
