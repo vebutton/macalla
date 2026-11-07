@@ -131,13 +131,12 @@ context.
    the app must be quit first, and the operator may need to quit it by hand). Then
    check that a stopped recording shows the Memos/Transcript switcher without switching
    notes. Close T-BUILD-09 if it does.
-3. Push `macalla` when the operator agrees: `6ba76ed5c6` and `8576136607` are local only.
-4. Next fork change: remember the last note view (TODO.md → Unscheduled). Propose
+3. Next fork change: remember the last note view (TODO.md → Unscheduled). Propose
    T-BUILD-10 and agree it before starting.
-5. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
+4. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
    `remove-agent-hook-installer` (local only, not pushed).
-6. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
-7. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
+5. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
+6. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
    `[NEEDS]` left open by choice (proof screenshots).
 
 **Continuity reminders:**

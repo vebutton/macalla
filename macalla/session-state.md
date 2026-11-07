@@ -211,6 +211,6 @@
 - Summary jobs left pending by earlier back-fills stay idle.
 
 **Session close (2026-11-06)**
-- `6ba76ed5c6`, `8576136607` and the close commits are local on `macalla`, not pushed.
+- `macalla` pushed to origin, including `6ba76ed5c6` and `8576136607`.
 - Full desktop suite from `apps/desktop`: 4221 pass, 3 pre-existing failures (billing 2,
   app-icon 1), confirmed failing without this session's changes.
