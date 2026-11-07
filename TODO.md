@@ -58,11 +58,15 @@
   → Transcription). The key stays in the app's local settings, never in the repo. A
   hosted provider receives the meeting audio. Provider choice and the meaning of
   "fallback" are open questions (section 3).
-- **T-BUILD-09** — Code done, switch `macallaFork.onDemandProcessing` in
-  `apps/desktop/src/macalla.ts`. Left: rebuild, then a manual check. Stop a recording
-  (nothing runs), relaunch (still nothing), Re-transcribe (transcript only), Generate
-  summary (summary). Keeps local transcription and summaries from competing for the GPU.
-  Doesn't apply with audio retention "none" (no saved audio to transcribe later).
+- **T-BUILD-09** — Switch `macallaFork.onDemandProcessing` in
+  `apps/desktop/src/macalla.ts`. Confirmed in the app: nothing runs after a stop,
+  Re-transcribe and Generate summary work on demand. One quirk left: right after a stop
+  the note looks blank (no Memos/Transcript switcher, templates shown) until you open
+  another note and come back. Commit `8576136607` (refresh the audio checks when a
+  capture ends) is meant for this but isn't built yet. Next: rebuild, re-sign, and check
+  whether the quirk is gone; close if so. Screenshots: `collateral/20261106 minor UI bug/`.
+  Keeps local transcription and summaries from competing for the GPU. Doesn't apply with
+  audio retention "none" (no saved audio to transcribe later).
 
 ## 3. Open questions
 - Which third-party transcription API is the fallback? Resolves at T-BUILD-07.

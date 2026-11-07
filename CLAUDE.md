@@ -99,8 +99,9 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
   transcription API as the fallback. First test: a recorded webinar played from YouTube
   (same system-audio path). Final check: a live webinar.
 - **Status:** Working tool in daily use (2026-11-01): bundled app records mic and system
-  audio, transcribes on-device after the recording, CLI exports Markdown. Left: T-BUILD-06
-  (live webinar), T-BUILD-07 (API fallback).
+  audio, transcribes on-device on demand (2026-11-06), CLI exports Markdown. Left:
+  T-BUILD-06 (live webinar), T-BUILD-07 (API fallback), T-BUILD-09 (rebuild and confirm
+  the post-stop view fix).
 - **Depends on:** Nothing. This is the first track.
 
 **Further tracks:** None yet. Candidates sit in `TODO.md` → Unscheduled.
@@ -114,19 +115,27 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 
 > Task state is not kept here: open items, progress and recurring work live in `TODO.md`.
 
-**Last:** 2026-11-05. Notes can now be renamed after recording: the header title input
-stays visible except while recording (fork-only change, rebuilt, confirmed working).
-Apple's summary model has a fixed 4K context, so a bigger model will come from a separate
-local-model project. Before that (2026-11-01): built from source and in daily use, agent
-config writes and the Deepgram fallback blocked, T-BUILD-01..05 and -08 closed.
+**Last:** 2026-11-06. Transcription and summaries are now on demand (T-BUILD-09, fork
+switch in `apps/desktop/src/macalla.ts`); confirmed in the app. One post-stop view quirk
+is left, with a fix committed but not built. Also wrote a sample summary prompt for the
+operator's model testing (`collateral/20261106-enhance-prompt-sample.md`). Before that
+(2026-11-05): notes can be renamed after recording; Apple's summary model has a fixed 4K
+context.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
    on demand; `macalla/build-notes.md` has the rebuild steps and day-to-day settings.
-2. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
+2. T-BUILD-09: rebuild and re-sign (commit `8576136607` isn't in the current bundle;
+   the app must be quit first, and the operator may need to quit it by hand). Then
+   check that a stopped recording shows the Memos/Transcript switcher without switching
+   notes. Close T-BUILD-09 if it does.
+3. Push `macalla` when the operator agrees: `6ba76ed5c6` and `8576136607` are local only.
+4. Next fork change: remember the last note view (TODO.md → Unscheduled). Propose
+   T-BUILD-10 and agree it before starting.
+5. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
    `remove-agent-hook-installer` (local only, not pushed).
-3. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
-4. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
+6. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
+7. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
    `[NEEDS]` left open by choice (proof screenshots).
 
 **Continuity reminders:**
@@ -150,6 +159,12 @@ config writes and the Deepgram fallback blocked, T-BUILD-01..05 and -08 closed.
   same title field as the header.
 - Summary "failed" status is in-memory only; a relaunch clears it and leaves the Summary
   tab showing just the title. That isn't a fix.
+- On-demand mode: tests force `macallaFork.onDemandProcessing = false`
+  (`src/test-setup.ts`) so upstream's suites keep their meaning. The full desktop suite
+  (run from `apps/desktop`) has 3 failures that predate this work: billing (2) and
+  app-icon (1, from the icon-picker unlock).
+- App logs: `~/Library/Logs/com.hyprnote.dev/app.log`; session audio:
+  `~/Library/Application Support/com.hyprnote.dev/sessions/<id>/`. Read-only.
 
 **Session continuity:** Next session is a cold start. Re-read CLAUDE.md before doing
 anything. Sessions are never re-entered. End-of-session updates cover three layers: this

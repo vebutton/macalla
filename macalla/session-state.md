@@ -152,3 +152,60 @@
   to handle long transcripts.
 - **Editing titles directly in the database:** not needed once the UI allows rename, and
   risky while the app runs.
+
+## 2026-11-06 — Summary prompt sample; on-demand transcription and summaries
+
+**Done**
+- **Where the summary prompt lives.** "Enhance" is summary generation. Jinja templates in
+  `crates/template-app/assets/` (`enhance.system.md.jinja`, `enhance.user.md.jinja`,
+  `enhance.format.md.jinja`, `_macros.jinja`), rendered by minijinja in
+  `crates/template-app/src/enhance.rs`. TypeScript appends Summary Mode, length guidance
+  and preferred names (`store/zustand/ai-task/task-configs/enhance-workflow.ts`). Length
+  policy in `crates/summary/src/lib.rs`.
+- **Sample prompt for model testing.** Rendered the full prompt, with a length helper and
+  the optional blocks, to `collateral/20261106-enhance-prompt-sample.md` (local-only) for
+  the operator's oMLX tests. Questions about template, custom format, dictionary terms,
+  session line and speaker labels were asked and not answered. Dropped deliberately
+  unless the operator returns to them.
+- **GPU contention, answered.** Soniqo runs through one Swift actor, so transcriptions
+  are effectively serialized; summaries (Apple's model) have no global lock and can
+  overlap a transcription. A new recording can start while another note processes.
+- **T-BUILD-09, on-demand processing (fork change, `6ba76ed5c6`).** New
+  `apps/desktop/src/macalla.ts` with `macallaFork.onDemandProcessing = true`. Gates:
+  - enhancer service: `requestAutoEnhance`, `queueAutoEnhanceIfSummaryEmpty` (returns
+    `{type: "on_demand"}`) and `resumePendingAutoEnhance` return early; manual
+    `enhance()` unchanged.
+  - `useUploadFile.ts`: no automatic summary after an upload.
+  - `capture-lifecycle.ts`: `transcriptionDeferred` skips the post-stop batch and the
+    recovery request; the capture still finishes cleanly, audio stays marked
+    "processing" so retention won't delete it. `stampSessionCaptureInterval`
+    (`capture-completion.ts`) writes the session's start/end times, which upstream only
+    wrote after a transcript.
+  - Tests set the flag false in `src/test-setup.ts`; two new tests. Built, re-signed.
+- **Post-stop audio check (`8576136607`).** First test: after a stop the Transcript tab
+  said "No transcript available" with no Re-transcribe, though `audio.mp3` was saved.
+  Cause: the `["audio", id, "exist"]` query was cached from before the recording and
+  nothing refreshed it; upstream never shows that screen because auto-transcription
+  fills the transcript. Fix: `session/index.tsx` invalidates the audio exist/url queries
+  when the note's capture ends. Typecheck, lint, fmt clean. Not built yet: the app
+  wouldn't quit by AppleScript and wasn't force-killed.
+- **Operator test on the old build.** On-demand Re-transcribe and Generate summary both
+  work. Quirk: right after a stop the note looks blank (no switcher, templates shown)
+  until switching notes and back. Screenshots in `collateral/20261106 minor UI bug/`.
+  Whether `8576136607` covers it is untested.
+
+**Decisions**
+- **Hardcoded fork constant, not a setting.** Simplest, and the operator wants it on.
+- **Retention "none" isn't covered:** no saved audio to transcribe later.
+- **Recording-import jobs still transcribe and summarize** (explicit user action).
+
+**Known limitations (accepted)**
+- After a manual Re-transcribe the transcript's start time is the click time (upstream
+  does the same); session times are correct.
+- The button says "Re-transcribe" even for a first transcription.
+- Summary jobs left pending by earlier back-fills stay idle.
+
+**Session close (2026-11-06)**
+- `6ba76ed5c6`, `8576136607` and the close commit are local on `macalla`, not pushed.
+- Full desktop suite from `apps/desktop`: 4221 pass, 3 pre-existing failures (billing 2,
+  app-icon 1), confirmed failing without this session's changes.
