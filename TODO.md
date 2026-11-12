@@ -82,12 +82,15 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
   internals, if the work gets that deep.
 - Better local summary models. Connected: oMLX through the built-in **Custom** LLM
   provider (settings only, see `macalla/build-notes.md`). Default model: Qwen 3.5 (best
-  so far, about 7.5/10; LFM2-2.6B about 5/10). Left: the operator may keep trying models
-  and prompts. Accurate
+  so far, about 7.5/10; LFM2-2.6B about 5/10). Left: compare prompts with the local-only
+  harness in `lab/summary-test/` (`./run.sh -T`, then a long transcript); apply the
+  winner as the Auto override in the app and check it there. Accurate
   summaries of long meetings go to an off-machine model, chosen per meeting; no chunking.
-  Possible small fork changes if wanted: a `max_tokens` cap for non-Anthropic providers,
-  and a thinking "Off" option (`chat_template_kwargs.enable_thinking`, in
-  `src/ai/reasoning-effort.ts`). Never run alongside Ollama.
+  Possible small fork changes if wanted: a `max_tokens` cap for non-Anthropic providers;
+  a thinking "Off" option (`chat_template_kwargs.enable_thinking`, in
+  `src/ai/reasoning-effort.ts`; confirmed working on oMLX, about 14× faster on a short
+  transcript); letting a template skip the default format rules, or a real length cap
+  (today it equals the transcript length). Never run alongside Ollama.
 - Remember the last note view (Summary, Memos or Transcript) when switching notes; today
   every note opens on the summary. Opened notes start with `view: null`
   (`store/zustand/tabs/schema.ts`), and `useCurrentNoteTab` (`session/components/shared.tsx`)

@@ -259,3 +259,40 @@
 **Session close (2026-11-07)**
 - Committed TODO, build notes, this file and the CLAUDE.md brief (`b8efc8e9e0`), then the
   Qwen 3.5 default and the T-BUILD-09 close as follow-up commits. Pushed to origin.
+
+## 2026-11-10 to 2026-11-12 — Summary formats and prompt testing
+
+**Done**
+- **Mapped the summary selections.**
+  - **Auto** (default): rules in `crates/template-app/assets/enhance.format.md.jinja`;
+    the in-app override is the `auto_summary_prompt` setting (Templates tab → Auto).
+  - **Gallery templates** ("by Anarlog"): fetched at runtime from
+    `anarlog.so/api/templates` (`shared/ui/resource-list/hooks.ts`); not in this repo.
+  - **User templates** ("Mine"): local SQLite `templates` table, title + description +
+    sections (`apps/desktop/src/templates/queries.ts`).
+  - All share `enhance.system.md.jinja` / `enhance.user.md.jinja`; a template only adds
+    a numbered section list.
+- **Found three sources of bloat:**
+  - the default format asks for "at least 3 detailed bullet points" per section;
+  - with a template selected, the Auto override is skipped
+    (`getFormatOverride`, `enhance-transform.ts`), so the default format still applies;
+  - the length cap equals the transcript's own length (`crates/summary/src/lib.rs`).
+- **Direct oMLX test.** The operator's five-section prompt on a short test transcript
+  gave output longer than the input (1.08×) and passed on speech-to-text errors as fact.
+  A three-section prompt (summary paragraph, to-dos, dates) gave about 0.25×, but still
+  missed one stated decision.
+- **Thinking off works per request** on oMLX via
+  `chat_template_kwargs: {enable_thinking: false}`: 3 s instead of 43 s on the short
+  transcript. Thinking was about 94% of output tokens.
+- **Built a local-only harness,** `lab/summary-test/` (`run.sh`, `prompts/`, `runs/`):
+  prompt × transcript × thinking on/off × N runs, logging size, tokens and time to
+  `results.tsv`. Added `lab/` to `.git/info/exclude`. Smoke test passed. Full runs are
+  the operator's, after a restart.
+
+**Decisions**
+- **`collateral/` is for operator input only.** Tooling Claude builds goes in `lab/`.
+- **Short format via the Auto override,** not a user template, because only the
+  override replaces the default "detailed bullets" rules. Not applied in the app yet.
+
+**Session close (2026-11-12)**
+- Committed this entry, TODO.md and the CLAUDE.md brief; pushed to origin.

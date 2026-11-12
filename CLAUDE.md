@@ -115,13 +115,11 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 
 > Task state is not kept here: open items, progress and recurring work live in `TODO.md`.
 
-**Last:** 2026-11-07. Summaries now run through oMLX, using the built-in **Custom** LLM
-provider. No code change was needed (setup in build-notes → Day-to-day use). Tested
-with LFM2: it streams and works, but quality is about 5/10. **Default summary model is
-now Qwen 3.5 on oMLX** (the oMLX service is always up). Decided: no chunking;
-accurate long-meeting summaries go off-machine when needed; transcription stays on
-Soniqo Parakeet; thinking stays on by default. **T-BUILD-09 closed:** rebuilt and
-re-signed, and a stopped recording now shows the switcher straight away.
+**Last:** 2026-11-12. Summaries are too long for cheap local models. Found where the
+summary formats live (Auto, gallery, user templates) and three causes of the length
+(archaeology). Built a local-only prompt test harness, `lab/summary-test/`. A
+three-section prompt (summary paragraph, to-dos, dates) cut output to about 0.25× of
+the transcript. Thinking off via `chat_template_kwargs` works on oMLX, about 14× faster.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
@@ -133,9 +131,10 @@ re-signed, and a stopped recording now shows the switcher straight away.
 4. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
    T-BUILD-07 is about *transcription*; off-machine *summaries* are already allowed
    per meeting.
-5. Summary model testing is the operator's to drive. If asked, the small fork options
-   are a `max_tokens` cap and a thinking "Off" switch (TODO.md → Unscheduled). Propose
-   an ID before starting either.
+5. Summary prompt testing (operator runs it): `lab/summary-test/run.sh -T`, then a long
+   transcript. Help read the results; then put the winner in the app's Auto override
+   (Templates tab → Auto), not a user template. Fork options in TODO.md → Unscheduled
+   (summaries line). Propose an ID before starting any.
 6. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
    `[NEEDS]` left open by choice (proof screenshots).
 
@@ -158,6 +157,8 @@ re-signed, and a stopped recording now shows the switcher straight away.
 - oMLX needs its API key (never in the repo) and must never run alongside Ollama. It
   ignores the app's Reasoning effort setting.
 - Node 26.0.0 triggers an engine warning (wants ≥26.12.1 or 22/24); harmless so far.
+- `collateral/` holds only the operator's input to Claude. Tooling and output Claude
+  builds go in `lab/` (local-only, in `.git/info/exclude`).
 - Titles are manual: the operator relabels processed notes with a `DONE - ` prefix, so
   don't add AI auto-titling or an auto date prefix. The AI Summary's first line is the
   same title field as the header.
