@@ -49,6 +49,14 @@
 
 ## 2. Item detail
 
+### PROJ
+- **T-PROJ-04** — Source session: a staged personal video call with several
+  participants planning the Christmas holidays. Scripted so it carries no work content
+  and is safe to show publicly. It needs several speakers (to show speaker labels),
+  stated goals, decisions, to-dos with owners, and dates, so the summary has real action
+  items to pick up. Record the call with Macalla, then screen-record transcribing and
+  summarizing it on demand with the default template.
+
 ### BUILD
 - **T-BUILD-07** — Upstream supports bring-your-own-key transcription providers (Settings
   → Transcription). The key stays in the app's local settings, never in the repo. A
