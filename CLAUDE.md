@@ -125,18 +125,22 @@ a new personal `triage-sheet` skill.
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
    on demand; `macalla/build-notes.md` has the rebuild steps and day-to-day settings.
-2. T-BUILD-07 (kept): the last open Track 1 item. Settle the open questions in TODO.md
+2. **T-BUILD-12 first** (unless something new comes up): release build with debug
+   assertions on, timed before and after. Steps in TODO.md → Item detail. Start with
+   the baseline; the operator picks the recording to copy. Leave `target/` alone until
+   then: the daily-use app lives in `target/debug/bundle`.
+3. T-BUILD-07 (kept): the last open Track 1 item. Settle the open questions in TODO.md
    (which provider; manual switch or automatic failover). It is about *transcription*;
    off-machine *summaries* are already allowed per meeting.
-3. Next fork change: remember the last note view (TODO.md → Unscheduled). Propose
+4. Next fork change: remember the last note view (TODO.md → Unscheduled). Propose
    T-BUILD-10 and agree it before starting.
-4. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
+5. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
    `remove-agent-hook-installer` (local only, not pushed).
-5. On each upstream sync, check whether the Pro-gating branch has landed (TODO.md →
+6. On each upstream sync, check whether the Pro-gating branch has landed (TODO.md →
    Standing operations). If it has, template editing needs a fork unlock.
-6. T-PROJ-04 demo video once things are stable. When Track 1 closes, agree a Track 2
+7. T-PROJ-04 demo video once things are stable. When Track 1 closes, agree a Track 2
    from the Unscheduled list.
-7. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
+8. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
    `[NEEDS]` left open by choice (proof screenshots).
 
 **Continuity reminders:**

@@ -46,6 +46,7 @@
 - [x] T-BUILD-08 Build an ad-hoc-signed `.app` bundle with the embedded `anarlog` CLI, and confirm the CLI lists and reads recent meetings (resolved 2026-11-01: bundle in daily use; `macalla` wrapper in `~/.local/bin` lists, reads and exports meetings to Markdown; rebuild steps in `macalla/build-notes.md`)
 - [x] T-BUILD-09 On-demand transcription and summaries (fork change): nothing runs automatically after a recording, upload or relaunch (resolved 2026-11-07: switch in `apps/desktop/src/macalla.ts`; Re-transcribe and Generate summary on demand; post-stop view fix `8576136607` built and confirmed. Doesn't apply with audio retention "none")
 - [x] T-BUILD-11 Thinking "Off" option (fork change): Reasoning effort → Off on the Custom provider sends `chat_template_kwargs.enable_thinking: false`, so thinking models on oMLX summarize without thinking (resolved 2026-11-13: built, re-signed and confirmed in the app; summaries with Off return quickly)
+- [ ] T-BUILD-12 Optimized bundle: build the recording app in release mode with debug assertions kept on, time on-device transcription and speaker labelling before and after, and keep whichever build wins
 
 ## 2. Item detail
 
@@ -62,6 +63,31 @@
   → Transcription). The key stays in the app's local settings, never in the repo. A
   hosted provider receives the meeting audio. Provider choice and the meaning of
   "fallback" are open questions (section 3).
+- **T-BUILD-12** — Not started; not urgent. Why: the bundle is a debug build, so the
+  Soniqo Swift/MLX library (its `build.rs` follows Cargo's profile) and the workspace
+  crates (`opt-level 0`) run unoptimized, and `src-tauri/target` holds 34 GB (32 GB of
+  it `debug/`). A plain release build is ruled out: without `cfg(debug_assertions)` upstream
+  switches the data folder from `com.hyprnote.dev` to `anarlog` (`crates/storage/src/global.rs`;
+  `app.db` has a fallback, audio and `store.json` don't) and enables the self-updater.
+  So build with `CARGO_PROFILE_RELEASE_DEBUG_ASSERTIONS=true` on the `tauri build`
+  command only (not the CLI build, not `.envrc`). Steps:
+  1. Baseline in the current build: import a copy of one 30–60 min recording as a new
+     note (don't re-transcribe a real note), fresh launch, oMLX stopped, on power. Read
+     `soniqo_batch_completed` and `local_diarization_completed` `elapsed_ms` from
+     `app.log`. Rough reference from the log: ~36 min of audio took 3.5 min to
+     transcribe plus 6.1 min of speaker labelling.
+  2. Back up `~/Library/Application Support/com.hyprnote.dev/` (~1.1 GB) and copy the
+     current `Anarlog Dev.app` out of `target/` as the rollback.
+  3. Release build (drop `--debug`, add the env var), redo the Soniqo keychain-free
+     resolve under `target/release/build/`, re-sign. Bundle moves to
+     `target/release/bundle/macos/`.
+  4. Verify: old notes, audio playback, settings, templates and the oMLX key all present;
+     no `Application Support/anarlog/` created; the `macalla` CLI still lists meetings.
+  5. Re-run the same import and compare both timings.
+  6. If it wins: delete `target/debug` and the root `target/`, update `macalla/build-notes.md`.
+     If not: restore the copied app, delete `target/release`, and instead shrink the
+     debug cache (`CARGO_PROFILE_DEV_DEBUG=line-tables-only`, optionally
+     `CARGO_INCREMENTAL=0`, in `.envrc`; about 20 GB estimated). Delete the test notes.
 
 ## 3. Open questions
 - Which third-party transcription API is the fallback? Resolves at T-BUILD-07.
