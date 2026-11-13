@@ -154,7 +154,7 @@ webinars). Synced upstream: web docs and CI only. The tool is in comfortable dai
   speech is consolidation-only, Unscheduled). No cloud transcription fallback without an
   explicit choice (T-BUILD-07). Summaries may go off-machine, chosen per meeting.
 - oMLX needs its API key (never in the repo) and must never run alongside Ollama. It
-  ignores the app's Reasoning effort setting.
+  ignores Reasoning effort Low/Medium/High; Off works (T-BUILD-11) and is in use.
 - Node 26.0.0 triggers an engine warning (wants ≥26.12.1 or 22/24); harmless so far.
 - `collateral/` holds only the operator's input to Claude. Tooling and output Claude
   builds go in `lab/` (local-only, in `.git/info/exclude`).
