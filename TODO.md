@@ -88,7 +88,7 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
   so far, about 7.5/10; LFM2-2.6B about 5/10). Default summary format (2026-11-13): the
   operator's own simplified user template, set as default in the app; good enough and
   fast. Auto stays unchanged. Revisit prompts and Auto when the bigger local models
-  arrive; the harness in `lab/summary-test/` stays for that. Accurate
+  on the Mac Studio are in place; the harness in `lab/summary-test/` stays for that. Accurate
   summaries of long meetings go to an off-machine model, chosen per meeting; no chunking.
   Possible small fork changes if wanted: a `max_tokens` cap for non-Anthropic providers;
   letting a template skip the default format rules, or a real length cap
