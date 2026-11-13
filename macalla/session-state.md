@@ -314,6 +314,15 @@
     eslint's `exhaustive-deps` error in `select.tsx` predates this change (upstream).
   - Rebuilt the debug bundle (frontend only) and re-signed with the identifier
     requirement.
+- **T-BUILD-06 closed:** the operator has recorded many live webinars across several
+  video-call platforms and audio devices, including back-to-back sessions; on-demand
+  processing suits that.
+- **Upstream review and sync:** `upstream/main` was 5 commits ahead (product-docs
+  articles, CI action pinning #8185), no app code. Fast-forwarded `main`, merged into
+  `macalla` (`f5b23d1bc8`), pushed both. Unmerged upstream branch
+  `devin/…-advanced-pro-gates` (2026-11-10) would gate custom template authoring,
+  scheduled recording and advanced Chat helpers behind Pro; watch note on the Sync
+  upstream row in TODO.md.
 - **Renaming a user template:** not in the Favorite/Duplicate/Delete menu. The title at
   the top of the editor pane (Mine → select template) is a borderless text field;
   autosaves.
@@ -322,3 +331,11 @@
 - **Default summary format is the operator's own simplified user template,** "010
   Actionable Meeting", set as default in the app. Supersedes the 2026-11-12 "short format via the Auto override"
   plan: Auto stays unchanged. Revisit when the bigger local models arrive.
+- **T-BUILD-07 kept** as written (cloud transcription fallback), after weighing narrowing
+  or dropping it.
+- **Priorities after Track 1's core:** T-BUILD-07, then T-BUILD-10, T-PROJ-03,
+  T-PROJ-04; then agree a Track 2.
+
+**Session close (2026-11-13)**
+- Commits `e9c0c8356c` (T-BUILD-11 code), `1b8cb83dd6`, `2f57e3972c` (notes), merge
+  `f5b23d1bc8`, plus this close. All pushed to origin.

@@ -115,26 +115,26 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 
 > Task state is not kept here: open items, progress and recurring work live in `TODO.md`.
 
-**Last:** 2026-11-12. Summaries are too long for cheap local models. Found where the
-summary formats live (Auto, gallery, user templates) and three causes of the length
-(archaeology). Built a local-only prompt test harness, `lab/summary-test/`. A
-three-section prompt (summary paragraph, to-dos, dates) cut output to about 0.25× of
-the transcript. Thinking off via `chat_template_kwargs` works on oMLX, about 14× faster.
+**Last:** 2026-11-13. Added a thinking Off option for the Custom provider (T-BUILD-11,
+closed): oMLX summaries now return fast. The operator's own simplified template
+"010 Actionable Meeting" is the default; Auto unchanged. Closed T-BUILD-06 (many live
+webinars). Synced upstream: web docs and CI only. The tool is in comfortable daily use.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
    on demand; `macalla/build-notes.md` has the rebuild steps and day-to-day settings.
-2. Next fork change: remember the last note view (TODO.md → Unscheduled). Propose
+2. T-BUILD-07 (kept): the last open Track 1 item. Settle the open questions in TODO.md
+   (which provider; manual switch or automatic failover). It is about *transcription*;
+   off-machine *summaries* are already allowed per meeting.
+3. Next fork change: remember the last note view (TODO.md → Unscheduled). Propose
    T-BUILD-10 and agree it before starting.
-3. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
+4. T-PROJ-03: the operator is testing first; then decide on the upstream PR from branch
    `remove-agent-hook-installer` (local only, not pushed).
-4. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
-   T-BUILD-07 is about *transcription*; off-machine *summaries* are already allowed
-   per meeting.
-5. Summaries are settled for now: the operator's own simplified user template is the
-   default; Auto stays unchanged. Revisit prompts (harness in `lab/summary-test/`) when
-   the bigger local models arrive. Reasoning effort is set to Off (T-BUILD-11, closed).
-6. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
+5. On each upstream sync, check whether the Pro-gating branch has landed (TODO.md →
+   Standing operations). If it has, template editing needs a fork unlock.
+6. T-PROJ-04 demo video once things are stable. When Track 1 closes, agree a Track 2
+   from the Unscheduled list.
+7. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
    `[NEEDS]` left open by choice (proof screenshots).
 
 **Continuity reminders:**
