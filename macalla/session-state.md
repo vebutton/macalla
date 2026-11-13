@@ -359,3 +359,55 @@
 
 **Session close (2026-11-13, second)**
 - Committed this entry and the CLAUDE.md brief; pushed to origin.
+
+## 2026-11-13 (third) — Build cache size and T-BUILD-12
+
+**Done**
+- **Why `src-tauri/target` is 34 GB** (plus 7.8 GB in the root `target/`): Cargo's
+  build cache, gitignored. `target/debug/deps` is 19 GB, about 85% of it the ~260
+  workspace build targets; `incremental/` 5.4 GB; `build/` 3.5 GB; two stale 3 GB copies
+  of `libanarlog_desktop_lib-*.a`. In that library, 2.0 of 3.1 GB is DWARF. Upstream's
+  `[profile.dev.package."*"]` already strips debug info from third-party crates
+  (`opt-level 1`, `debug = false`); only workspace crates (`opt-level 0`, `debug = true`)
+  carry it. The bundle itself is ~630 MB (486 MB executable, 120 MB resources) and needs
+  nothing from `target/` at runtime. **It lives in `target/debug/bundle`, with no copy in
+  `/Applications`**, so a clean deletes the daily-use app.
+- **Debug as a mode switch:** many upstream paths branch on `cfg(debug_assertions)`.
+  Without it, `crates/storage/src/global.rs` resolves the base folder to `anarlog/` (or
+  legacy `hyprnote/`) instead of `com.hyprnote.dev`, and `updater2` stops returning
+  early. `app.db` has a fallback (`apps/desktop/src-tauri/src/db.rs`, uses the identifier
+  folder if the new one has no database), so notes, transcripts, templates and
+  `app_settings` would survive; session audio (`sessions/`, 1 GB), `store.json`, the
+  search index and window state would not be found. Keychain service
+  (`com.anarlog.dev.secure-store`) follows the identifier, so keys survive. Read from the
+  code, not tested.
+- **Transcription runs unoptimized today:** `crates/transcribe-soniqo/build.rs` picks the
+  SwiftPM configuration from Cargo's `PROFILE`, so the Swift/MLX library is a debug
+  build. Speaker labelling is Rust (`pyannote-local`: ONNX Runtime plus workspace
+  clustering and segmentation at `opt-level 0`). App-log baseline: a ~36 min recording
+  took 209 s (`soniqo_batch_completed`) plus 367 s (`local_diarization_completed`).
+- **Recorded T-BUILD-12** (`a5c6c5272f`) with steps in TODO.md item detail, and set it
+  first in the CLAUDE.md pickup list. Triage sheet v6 in `reminders/`.
+
+**Decisions**
+- **Option 2 for T-BUILD-12:** release build with
+  `CARGO_PROFILE_RELEASE_DEBUG_ASSERTIONS=true` on the `tauri build` command only, so
+  the data folder and disabled updater stay as they are while the Swift/MLX library and
+  workspace crates compile optimized. Timed before and after on an imported copy of one
+  recording.
+- **Caches not cleaned today.** The safe deletions (root `target/`, 7.8 GB;
+  `target/debug/incremental`, 5.4 GB) are left until T-BUILD-12 decides. The operator
+  freed 52 GB elsewhere on the Mac.
+
+**Ruled out**
+- **Plain release build:** it moves the data folder (audio and preferences go missing,
+  new data splits across two folders) and enables the self-updater, which could replace
+  the fork with upstream's app.
+- **Re-transcribing a real note for the timing test:** it would overwrite the
+  transcript and speaker names. Import a copy instead.
+
+**Fallback if T-BUILD-12 doesn't win (option 1):** `CARGO_PROFILE_DEV_DEBUG=line-tables-only`,
+optionally `CARGO_INCREMENTAL=0`, in `.envrc`; estimated 34 GB → 10–15 GB.
+
+**Session close (2026-11-13, third)**
+- Commits `a5c6c5272f` and this close; pushed to origin.

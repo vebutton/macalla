@@ -120,7 +120,9 @@ closed): oMLX summaries now return fast. The operator's own simplified template
 "010 Actionable Meeting" is the default; Auto unchanged. Closed T-BUILD-06 (many live
 webinars). Synced upstream: web docs and CI only. The tool is in comfortable daily use.
 Later: T-PROJ-04 detailed (staged holiday-planning call); triage sheets v1-v5 built with
-a new personal `triage-sheet` skill.
+a new personal `triage-sheet` skill. Last thread: why `target/` is 34 GB; found the
+debug bundle runs Soniqo's Swift/MLX unoptimized; opened T-BUILD-12 (release build with
+debug assertions on, timed); triage sheet v6.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
