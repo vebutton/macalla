@@ -41,7 +41,7 @@
 - [x] T-BUILD-03 Grant macOS microphone and system-audio permissions and confirm both are captured (resolved 2026-11-01: granted to the bundled app; mic and system audio both transcribed in a test recording)
 - [x] T-BUILD-04 Set up GPU on-device transcription (Soniqo or whisper.cpp) and confirm it transcribes (resolved 2026-11-01: Soniqo Parakeet Batch, after recording; 52 s test transcribed locally in ~3 s with no network transcription attempt)
 - [x] T-BUILD-05 Test: record and transcribe a recorded webinar played from YouTube (resolved 2026-11-01: a 48-minute recorded video transcribed completely on-device, 6,940 words with no missing blocks, about 4 minutes after stop including speaker labels; headset, mixed and speaker audio also tried in a two-way video call)
-- [ ] T-BUILD-06 Final check: record and transcribe a live webinar
+- [x] T-BUILD-06 Final check: record and transcribe a live webinar (resolved 2026-11-13: many live webinars recorded across several video-call platforms and audio devices, including back-to-back sessions; on-demand transcription and summaries suit that well)
 - [ ] T-BUILD-07 Configure a third-party transcription API as the fallback and confirm it transcribes
 - [x] T-BUILD-08 Build an ad-hoc-signed `.app` bundle with the embedded `anarlog` CLI, and confirm the CLI lists and reads recent meetings (resolved 2026-11-01: bundle in daily use; `macalla` wrapper in `~/.local/bin` lists, reads and exports meetings to Markdown; rebuild steps in `macalla/build-notes.md`)
 - [x] T-BUILD-09 On-demand transcription and summaries (fork change): nothing runs automatically after a recording, upload or relaunch (resolved 2026-11-07: switch in `apps/desktop/src/macalla.ts`; Re-transcribe and Generate summary on demand; post-stop view fix `8576136607` built and confirmed. Doesn't apply with audio retention "none")
@@ -50,12 +50,6 @@
 ## 2. Item detail
 
 ### BUILD
-- **T-BUILD-06** — The tool is in daily use. What's left is a live webinar, recorded with
-  the floating bar on and the tray icon off. Known limitations to expect: synthesized word
-  timings (playback highlight and click-to-seek drift; text is fine), and far-end bleed
-  into the mic channel when using a speaker rather than headphones. Worth trying on a
-  speaker call: select the speakerphone's own mic, whose hardware echo cancellation
-  should cut the bleed.
 - **T-BUILD-07** — Upstream supports bring-your-own-key transcription providers (Settings
   → Transcription). The key stays in the app's local settings, never in the repo. A
   hosted provider receives the meeting audio. Provider choice and the meaning of
@@ -72,7 +66,7 @@ Recurring work: no IDs, no checkboxes, tracked by last-run date.
 
 | Operation | Cadence / trigger | Last run | Notes |
 |---|---|---|---|
-| Sync upstream | Before a build session, or when upstream fixes are wanted | 2026-10-31 (already level) | Fast-forward `main` to `upstream/main`, then merge `main` into `macalla`. Re-check pinned toolchain versions after syncing. |
+| Sync upstream | Before a build session, or when upstream fixes are wanted | 2026-11-13 (fast-forward, web docs and CI only) | Fast-forward `main` to `upstream/main`, then merge `main` into `macalla`. Re-check pinned toolchain versions after syncing. **Watch:** unmerged upstream branch `devin/…-advanced-pro-gates` (2026-11-10) puts custom template authoring, scheduled recording and advanced Chat helpers behind Pro. If it lands, the next sync would lock editing the default summary template; unlock it in the fork like the app-icon picker. Reviewed 2026-11-13: `upstream/main` 5 commits ahead (web docs, CI action pinning), no app code. |
 
 ## 5. Unscheduled
 Ideas that came up but aren't committed work. No ID until promoted into a track.

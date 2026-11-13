@@ -100,8 +100,8 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
   (same system-audio path). Final check: a live webinar.
 - **Status:** Working tool in daily use (2026-11-01): bundled app records mic and system
   audio, transcribes on-device on demand (T-BUILD-09, closed 2026-11-07), summarizes
-  via oMLX, CLI exports Markdown. Left: T-BUILD-06 (live webinar), T-BUILD-07 (API
-  fallback).
+  via oMLX, CLI exports Markdown. Live webinars confirmed (T-BUILD-06, closed
+  2026-11-13). Left: T-BUILD-07 (API fallback).
 - **Depends on:** Nothing. This is the first track.
 
 **Further tracks:** None yet. Candidates sit in `TODO.md` → Unscheduled.
