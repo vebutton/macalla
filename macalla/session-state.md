@@ -339,3 +339,23 @@
 **Session close (2026-11-13)**
 - Commits `e9c0c8356c` (T-BUILD-11 code), `1b8cb83dd6`, `2f57e3972c` (notes), merge
   `f5b23d1bc8`, plus this close. All pushed to origin.
+
+**Later the same day (2026-11-13)**
+- Refreshed the local-only `.atlas/overview.md`.
+- T-PROJ-04 detail: the demo's source session is a staged personal video call with
+  several participants planning the Christmas holidays (goals, decisions, to-dos with
+  owners, dates). Folded into T-PROJ-04, not a new item, because the deliverable is
+  the same.
+- Triage sheets: built a one-page PDF reminder sheet (v1), then turned it into a
+  personal skill, `triage-sheet` (`~/.claude/skills/`, outside this repo): template,
+  render script (next version number, PDF only, one-page and placeholder checks).
+  Tested on this repo and a made-up Cowork-style project. The operator's steer: speed
+  over thoroughness, a 30-second glance to pick the top item, no tracking of small
+  gaps; the sheet is for their eyes only, so it names things plainly; only PDFs in
+  `reminders/`; the header carries the environment code (`CC/VS:`, `CC:`, `CW:`).
+  Sheets v2-v5 are in `reminders/` (local-only, `.git/info/exclude`).
+- TODO.md §5: the summary-prompt revisit now waits on the bigger models on the Mac
+  Studio (`f40cf57a0c`), matching what the operator said.
+
+**Session close (2026-11-13, second)**
+- Committed this entry and the CLAUDE.md brief; pushed to origin.

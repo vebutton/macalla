@@ -119,6 +119,8 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 closed): oMLX summaries now return fast. The operator's own simplified template
 "010 Actionable Meeting" is the default; Auto unchanged. Closed T-BUILD-06 (many live
 webinars). Synced upstream: web docs and CI only. The tool is in comfortable daily use.
+Later: T-PROJ-04 detailed (staged holiday-planning call); triage sheets v1-v5 built with
+a new personal `triage-sheet` skill.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
@@ -156,6 +158,9 @@ webinars). Synced upstream: web docs and CI only. The tool is in comfortable dai
 - oMLX needs its API key (never in the repo) and must never run alongside Ollama. It
   ignores Reasoning effort Low/Medium/High; Off works (T-BUILD-11) and is in use.
 - Node 26.0.0 triggers an engine warning (wants ≥26.12.1 or 22/24); harmless so far.
+- `reminders/` (local-only, in `.git/info/exclude`) holds disposable triage-sheet PDFs
+  only. Make them with the personal `/triage-sheet` skill (`~/.claude/skills/`, not in
+  this repo).
 - `collateral/` holds only the operator's input to Claude. Tooling and output Claude
   builds go in `lab/` (local-only, in `.git/info/exclude`).
 - Titles are manual: the operator relabels processed notes with a `DONE - ` prefix, so
