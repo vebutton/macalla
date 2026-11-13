@@ -5,7 +5,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { normalizeLLMProviderId, useLanguageModel } from "./useLLMConnection";
 
-const mocks = vi.hoisted(() => ({ provider: "custom" as string }));
+const mocks = vi.hoisted(() => ({
+  provider: "custom" as string,
+  reasoningEffort: "default" as string,
+}));
 const managed = vi.hoisted(() => ({ ready: true, disabled: false }));
 vi.mock("@tauri-apps/plugin-http", () => ({ fetch: vi.fn() }));
 vi.mock("~/settings/queries", () => ({
@@ -27,12 +30,44 @@ vi.mock("~/shared/config", () => ({
     intelligence_disabled: managed.disabled,
     current_llm_provider: mocks.provider,
     current_llm_model: "mtplx",
-    current_llm_reasoning_effort: "default",
+    current_llm_reasoning_effort: mocks.reasoningEffort,
   }),
 }));
 
 afterEach(() => {
   mocks.provider = "custom";
+  mocks.reasoningEffort = "default";
+});
+
+// Macalla fork (T-BUILD-11)
+it("turns thinking off through the chat template for Custom", async () => {
+  mocks.reasoningEffort = "off";
+  let body: Record<string, unknown> = {};
+  vi.mocked(tauriFetch).mockImplementation(async (_input, init) => {
+    body = JSON.parse(String(init?.body));
+    return Response.json({
+      id: "local-completion",
+      model: "mtplx",
+      created: 0,
+      choices: [
+        {
+          index: 0,
+          message: { role: "assistant", content: "Local summary" },
+          finish_reason: "stop",
+        },
+      ],
+    });
+  });
+
+  const { result, unmount } = renderHook(() => useLanguageModel());
+  await generateText({
+    model: result.current!,
+    prompt: "Summarize the meeting",
+    maxRetries: 0,
+  });
+  expect(body.chat_template_kwargs).toEqual({ enable_thinking: false });
+  expect(body).not.toHaveProperty("reasoning_effort");
+  unmount();
 });
 
 it.each([false, true])(

@@ -28,6 +28,7 @@ import {
 import {
   normalizeReasoningEffort,
   supportsReasoningEffort,
+  supportsThinkingOff,
 } from "~/ai/reasoning-effort";
 import { useAuth } from "~/auth";
 import { useBillingAccess } from "~/auth/billing-context";
@@ -79,6 +80,15 @@ import {
 import { SETTING_CONTROL_CLASS, SettingRow } from "~/settings/setting-row";
 import { useConfigValues } from "~/shared/config";
 import { SettingsAlertToast } from "~/shared/ui/settings-alert";
+
+// Macalla fork (T-BUILD-11): a saved "off" behaves as Default on providers
+// without the Off option, so show it that way.
+const displayedReasoningEffort = (providerId: string, value: unknown) => {
+  const effort = normalizeReasoningEffort(value);
+  return effort === "off" && !supportsThinkingOff(providerId)
+    ? "default"
+    : effort;
+};
 
 export function SelectProviderAndModel() {
   const { t } = useLingui();
@@ -472,7 +482,10 @@ export function SelectProviderAndModel() {
         >
           {(labelProps) => (
             <Select
-              value={normalizeReasoningEffort(current_llm_reasoning_effort)}
+              value={displayedReasoningEffort(
+                effectiveSelection.provider,
+                current_llm_reasoning_effort,
+              )}
               onValueChange={(value) =>
                 setReasoningEffort(normalizeReasoningEffort(value))
               }
@@ -484,6 +497,11 @@ export function SelectProviderAndModel() {
                 <SelectItem value="default">
                   <Trans>Default</Trans>
                 </SelectItem>
+                {supportsThinkingOff(effectiveSelection.provider) ? (
+                  // Macalla fork (T-BUILD-11): plain English, so the locale
+                  // catalogs stay identical to upstream.
+                  <SelectItem value="off">Off</SelectItem>
+                ) : null}
                 <SelectItem value="low">
                   <Trans>Low</Trans>
                 </SelectItem>
