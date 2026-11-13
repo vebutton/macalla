@@ -45,6 +45,7 @@
 - [ ] T-BUILD-07 Configure a third-party transcription API as the fallback and confirm it transcribes
 - [x] T-BUILD-08 Build an ad-hoc-signed `.app` bundle with the embedded `anarlog` CLI, and confirm the CLI lists and reads recent meetings (resolved 2026-11-01: bundle in daily use; `macalla` wrapper in `~/.local/bin` lists, reads and exports meetings to Markdown; rebuild steps in `macalla/build-notes.md`)
 - [x] T-BUILD-09 On-demand transcription and summaries (fork change): nothing runs automatically after a recording, upload or relaunch (resolved 2026-11-07: switch in `apps/desktop/src/macalla.ts`; Re-transcribe and Generate summary on demand; post-stop view fix `8576136607` built and confirmed. Doesn't apply with audio retention "none")
+- [x] T-BUILD-11 Thinking "Off" option (fork change): Reasoning effort → Off on the Custom provider sends `chat_template_kwargs.enable_thinking: false`, so thinking models on oMLX summarize without thinking (resolved 2026-11-13: built, re-signed and confirmed in the app; summaries with Off return quickly)
 
 ## 2. Item detail
 
@@ -82,14 +83,13 @@ Ideas that came up but aren't committed work. No ID until promoted into a track.
   internals, if the work gets that deep.
 - Better local summary models. Connected: oMLX through the built-in **Custom** LLM
   provider (settings only, see `macalla/build-notes.md`). Default model: Qwen 3.5 (best
-  so far, about 7.5/10; LFM2-2.6B about 5/10). Left: compare prompts with the local-only
-  harness in `lab/summary-test/` (`./run.sh -T`, then a long transcript); apply the
-  winner as the Auto override in the app and check it there. Accurate
+  so far, about 7.5/10; LFM2-2.6B about 5/10). Default summary format (2026-11-13): the
+  operator's own simplified user template, set as default in the app; good enough and
+  fast. Auto stays unchanged. Revisit prompts and Auto when the bigger local models
+  arrive; the harness in `lab/summary-test/` stays for that. Accurate
   summaries of long meetings go to an off-machine model, chosen per meeting; no chunking.
   Possible small fork changes if wanted: a `max_tokens` cap for non-Anthropic providers;
-  a thinking "Off" option (`chat_template_kwargs.enable_thinking`, in
-  `src/ai/reasoning-effort.ts`; confirmed working on oMLX, about 14× faster on a short
-  transcript); letting a template skip the default format rules, or a real length cap
+  letting a template skip the default format rules, or a real length cap
   (today it equals the transcript length). Never run alongside Ollama.
 - Remember the last note view (Summary, Memos or Transcript) when switching notes; today
   every note opens on the summary. Opened notes start with `view: null`

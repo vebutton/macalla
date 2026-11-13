@@ -296,3 +296,29 @@
 
 **Session close (2026-11-12)**
 - Committed this entry, TODO.md and the CLAUDE.md brief; pushed to origin.
+
+## 2026-11-13 — Thinking Off and the default summary template
+
+**Done**
+- **T-BUILD-11 closed (fork change):** confirmed in the app by the operator. Reasoning effort → Off on
+  the Custom provider sends `chat_template_kwargs: {enable_thinking: false}`
+  (`src/ai/reasoning-effort.ts`, dropdown in `settings/ai/llm/select.tsx`). Trigger:
+  with thinking on, short and medium prompts never returned on oMLX.
+  - Custom only: hosted OpenAI-compatible APIs may reject the unknown field; LM Studio
+    and Ollama untested. A saved "off" behaves and displays as Default elsewhere.
+  - Plain English "Off" (no `<Trans>`), so the ~200 locale catalog files stay identical
+    to upstream and merges stay clean.
+  - `@ai-sdk/openai-compatible` 2.0.41 forwards unknown provider-option keys verbatim,
+    so the snake_case key reaches the body as-is. A wire-level test asserts it.
+  - Checks: typecheck clean, oxfmt/oxlint clean, full suite only the 3 known failures.
+    eslint's `exhaustive-deps` error in `select.tsx` predates this change (upstream).
+  - Rebuilt the debug bundle (frontend only) and re-signed with the identifier
+    requirement.
+- **Renaming a user template:** not in the Favorite/Duplicate/Delete menu. The title at
+  the top of the editor pane (Mine → select template) is a borderless text field;
+  autosaves.
+
+**Decisions**
+- **Default summary format is the operator's own simplified user template,** "010
+  Actionable Meeting", set as default in the app. Supersedes the 2026-11-12 "short format via the Auto override"
+  plan: Auto stays unchanged. Revisit when the bigger local models arrive.

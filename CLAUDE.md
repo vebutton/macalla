@@ -131,10 +131,9 @@ the transcript. Thinking off via `chat_template_kwargs` works on oMLX, about 14�
 4. T-BUILD-06: live webinar. Then T-BUILD-07 (fallback provider: open questions in TODO).
    T-BUILD-07 is about *transcription*; off-machine *summaries* are already allowed
    per meeting.
-5. Summary prompt testing (operator runs it): `lab/summary-test/run.sh -T`, then a long
-   transcript. Help read the results; then put the winner in the app's Auto override
-   (Templates tab → Auto), not a user template. Fork options in TODO.md → Unscheduled
-   (summaries line). Propose an ID before starting any.
+5. Summaries are settled for now: the operator's own simplified user template is the
+   default; Auto stays unchanged. Revisit prompts (harness in `lab/summary-test/`) when
+   the bigger local models arrive. Reasoning effort is set to Off (T-BUILD-11, closed).
 6. Refresh `.atlas/overview.md` (local-only, excluded) when the project moves; one
    `[NEEDS]` left open by choice (proof screenshots).
 

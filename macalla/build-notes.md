@@ -161,8 +161,9 @@ codesign --force --sign - --identifier com.hyprnote.dev \
     big model is still loaded, and don't Re-transcribe while it's summarizing.
     **Default summary model: Qwen 3.5** (from 2026-11-07). If oMLX is down, Generate
     summary fails with no fallback; switch to Apple until it's back.
-  - **Reasoning effort** does nothing with oMLX (it ignores `reasoning_effort`).
-    Thinking models think by default.
+  - **Reasoning effort:** Low/Medium/High do nothing with oMLX (it ignores
+    `reasoning_effort`); thinking models think by default. **Off** (Custom provider only,
+    T-BUILD-11) sends `chat_template_kwargs.enable_thinking: false`, which oMLX honours.
   - **Format check is shallow:** only the first ~30 characters are validated (a `# `
     heading, matching the template's first section if one is set). Drift later in the
     summary never triggers a retry.
