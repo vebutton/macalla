@@ -23,11 +23,37 @@ PATH. A local-only direnv `.envrc` (excluded from git) adds it while inside the 
 Non-interactive shells (e.g. an agent's shell) don't run the direnv hook. Use
 `direnv exec . <command>` there.
 
+### How the scoping works (linked vs unlinked)
+Homebrew installs each tool into a versioned folder (`/opt/homebrew/Cellar/<name>/<ver>`)
+that isn't on PATH. "Linked" means Homebrew has also put a shortcut (symlink) in
+`/opt/homebrew/bin`, which is on PATH, so every shell finds the tool. "Unlinked" means
+that shortcut is gone and the tool is still installed. Homebrew also keeps a
+version-independent shortcut `/opt/homebrew/opt/<name>` for every installed tool, linked
+or not, and moves it on each upgrade. `.envrc` puts those `opt` folders on PATH, so
+upgrades never break Macalla's lookup.
+
 ### Side effects to watch
 - direnv pulls in Homebrew `bash` as a dependency. It was unlinked (`brew unlink bash`) so
   `/usr/bin/env bash` still finds macOS's `/bin/bash`; direnv calls its own bash by full
-  path. After a `brew upgrade`, check `which bash` and `which cmake` (outside the repo)
-  haven't been re-linked.
+  path.
+- **`brew upgrade` and re-linking** (checked in Homebrew 7.0.15's source, 2026-11-19):
+  - Upgrading a tool directly (`brew upgrade cmake`, or a bare `brew upgrade`) keeps its
+    link state. Unlinked stays unlinked.
+  - Upgrading a tool *as a dependency* of something else (e.g. a direnv upgrade pulling a
+    newer bash) only keeps the link state if it was linked. An unlinked dependency
+    gets re-linked.
+  - A re-link isn't a breakage: bash 5 or cmake just becomes visible outside the repo.
+    Macalla is unaffected. The real risk is a cmake *version* change breaking a `-sys`
+    crate rebuild, which fails loudly.
+  - Check after a broad upgrade, run from outside the repo (prints nothing if all is
+    well):
+    `ls /opt/homebrew/bin/bash /opt/homebrew/bin/cmake 2>/dev/null && brew unlink bash cmake`
+  - Claude Code is the cask `claude-code@latest`, with no formula dependencies:
+    `brew upgrade claude-code@latest` touches nothing else.
+- Never hand-link a tool into `/opt/homebrew/bin`. A stray `rustup` symlink pointing
+  straight at `Cellar/rustup/1.29.2` was found and removed on 2026-11-19: Homebrew's
+  post-upgrade cleanup would have deleted its target and left it pointing at nothing.
+  Global `cargo`/`rustc` come from Homebrew `rust`, which is unrelated.
 - `pnpm install` downloads a headless Chrome to `~/.cache/puppeteer` (a dev dependency's
   postinstall), and pnpm keeps its package store in `~/Library/pnpm`.
 
