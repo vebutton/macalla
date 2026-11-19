@@ -115,14 +115,12 @@ Upstream's stack, pinned by upstream. Don't pick different versions.
 
 > Task state is not kept here: open items, progress and recurring work live in `TODO.md`.
 
-**Last:** 2026-11-13. Added a thinking Off option for the Custom provider (T-BUILD-11,
-closed): oMLX summaries now return fast. The operator's own simplified template
-"010 Actionable Meeting" is the default; Auto unchanged. Closed T-BUILD-06 (many live
-webinars). Synced upstream: web docs and CI only. The tool is in comfortable daily use.
-Later: T-PROJ-04 detailed (staged holiday-planning call); triage sheets v1-v5 built with
-a new personal `triage-sheet` skill. Last thread: why `target/` is 34 GB; found the
-debug bundle runs Soniqo's Swift/MLX unoptimized; opened T-BUILD-12 (release build with
-debug assertions on, timed); triage sheet v6.
+**Last:** 2026-11-19. Short session on Homebrew upgrades: read Homebrew's upgrade code
+and confirmed they can't break Macalla (at worst bash or cmake gets re-linked, i.e.
+visible outside the repo). Removed a stray hand-made global `rustup` symlink. The
+build-notes brew section was rewritten (`72ce26a3ef`). Before that (2026-11-13):
+T-BUILD-11 and T-BUILD-06 closed, T-BUILD-12 opened after finding the debug bundle runs
+Soniqo's Swift/MLX unoptimized.
 
 **Next session — pick up here:**
 1. Cold start: re-read CLAUDE.md and CLAUDE.local.md. Consult `macalla/session-state.md`
@@ -152,7 +150,10 @@ debug assertions on, timed); triage sheet v6.
   for upstream maintainers.
 - Toolchain is per-repo via direnv (`.envrc`, local-only). Non-interactive shells need
   `direnv exec . <cmd>`; after editing `.envrc`, run `direnv allow .`. Never link
-  Homebrew rustup, cmake or bash globally.
+  Homebrew rustup, cmake or bash globally, and never hand-symlink into
+  `/opt/homebrew/bin`. A dependency upgrade can re-link bash or cmake: run the check in
+  build-notes → Side effects after a broad `brew upgrade`. Claude Code is the cask
+  `claude-code@latest`; upgrading it alone is safe.
 - Record only from the bundle (Finder or `open`), never `pnpm dev:desktop`: dev mode
   attributes audio permissions to the editor. Every rebuild must be re-signed with the
   identifier requirement or permissions are lost (exact steps in build-notes).

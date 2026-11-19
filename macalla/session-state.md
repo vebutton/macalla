@@ -411,3 +411,33 @@ optionally `CARGO_INCREMENTAL=0`, in `.envrc`; estimated 34 GB → 10–15 GB.
 
 **Session close (2026-11-13, third)**
 - Commits `a5c6c5272f` and this close; pushed to origin.
+
+## 2026-11-19 — Homebrew upgrades and the unlinked tools
+
+**Done**
+- **Answered whether `brew upgrade` can cause hidden failures here.** Short answer: no.
+  Checked the live state: bash and cmake unlinked (not in `/opt/homebrew/bin`), rustup
+  keg-only; inside the repo `cargo`, `rustc` (1.94.0) and `cmake` resolve through the
+  `.envrc` `opt` paths, which Homebrew moves on every upgrade.
+- **Read Homebrew 7.0.15's upgrade code** (`upgrade.rb`, `formula_installer.rb`):
+  a direct upgrade keeps the old link state (`link_keg = keg.linked?`); an upgrade *as a
+  dependency* (`install_dependency`) only carries it over when the tool was linked, so
+  an unlinked dependency falls back to the default and is re-linked. A re-link is only
+  visibility outside the repo, not a breakage.
+- **Removed a stray hand-made `/opt/homebrew/bin/rustup` symlink** (Oct 31, absolute path
+  to `Cellar/rustup/1.29.2`, not Homebrew-managed). The pending rustup 1.29.3 upgrade's
+  cleanup would have left it dangling. In-repo rustup verified afterwards.
+- **build-notes rewritten** (`72ce26a3ef`, pushed): linked vs unlinked in PATH terms,
+  the upgrade rules, a post-upgrade check one-liner, the Claude Code cask name, and a
+  "never hand-link into `/opt/homebrew/bin`" rule.
+
+**Findings**
+- Claude Code is installed as the cask `claude-code@latest` (2.1.302 at the time), not
+  `claude-code`. It has no formula dependencies, so upgrading it touches nothing else.
+- Global `cargo`/`rustc` are Homebrew `rust` 1.99.1 (Oct 18, predates this project).
+- Pending upgrades at close: cmake 4.4.5 → 4.5.0, rustup 1.29.2 → 1.29.3, Claude Code.
+  A cmake version change is the one real (loud) risk, to `-sys` crate rebuilds.
+
+**Session close (2026-11-19)**
+- Commits `72ce26a3ef` and this close; pushed to origin. No TODO.md changes: no new
+  items or open questions came out of this thread.
